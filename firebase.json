@@ -5,6 +5,23 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "convoy-backend",
+          "region": "asia-southeast1"
+        }
+      }
+    ]
+  },
   "apphosting": {
     "backendId": "convoy-backend",
     "rootDir": "/",

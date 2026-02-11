@@ -36,14 +36,14 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
         <>
             <AdvancedMarker position={position} onClick={() => setIsOpen(true)}>
                 <div className="relative group cursor-pointer">
-                    <Pin background={"#F59E0B"} borderColor={"#000"} glyphColor={"#000"} scale={1.2} />
+                    <Pin background={"var(--main)"} borderColor={"#000"} glyphColor={"#000"} scale={1.2} />
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-1 bg-black/20 blur-sm rounded-full"></div>
                 </div>
             </AdvancedMarker>
 
             {isOpen && (
                 <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[320px] z-50">
-                    <Card className="border-4 border-amber-500 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white relative overflow-hidden">
+                    <Card className="border-4 bg-white relative overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" style={{ borderColor: 'var(--main)' }}>
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
                             className="absolute top-2 right-2 p-1 hover:bg-zinc-100 rounded-full"
@@ -51,10 +51,10 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
                             <X className="h-4 w-4" />
                         </button>
 
-                        <div className="absolute top-0 left-0 w-full h-1.5 bg-amber-500"></div>
+                        <div className="absolute top-0 left-0 w-full h-1.5" style={{ backgroundColor: 'var(--main)' }}></div>
 
                         <CardHeader className="pb-2">
-                            <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-widest mb-1">
+                            <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-widest mb-1" style={{ color: 'var(--main)' }}>
                                 <Hammer className="h-3 w-3" /> Verified Builder
                             </div>
                             <CardTitle className="text-xl font-black">{name}</CardTitle>
@@ -72,7 +72,8 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
                             </Button>
                             <Button
                                 onClick={handlePaywallTrigger}
-                                className="w-full bg-amber-500 text-black border-2 border-black hover:bg-amber-400"
+                                className="w-full text-black border-2 border-black hover:opacity-90"
+                                style={{ backgroundColor: 'var(--main)' }}
                             >
                                 <Navigation className="h-4 w-4 mr-2" /> Navigate
                             </Button>
@@ -82,7 +83,7 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
             )}
 
             <AlertDialog open={showPaywall} onOpenChange={setShowPaywall}>
-                <AlertDialogContent className="border-4 border-black shadow-[8px_8px_0px_0px_#F59E0B]">
+                <AlertDialogContent className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" style={{ boxShadow: '8px 8px 0px 0px var(--main)' }}>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-2xl font-black uppercase">Unlock Builder Network</AlertDialogTitle>
                         <AlertDialogDescription asChild className="text-base">
@@ -97,7 +98,7 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel className="border-2 border-black">Cancel</AlertDialogCancel>
-                        <AlertDialogAction className="bg-amber-500 text-black border-2 border-black hover:bg-amber-400 font-bold">
+                        <AlertDialogAction className="text-black border-2 border-black hover:opacity-90 font-bold" style={{ backgroundColor: 'var(--main)' }}>
                             Unlock Now
                         </AlertDialogAction>
                     </AlertDialogFooter>

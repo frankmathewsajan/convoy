@@ -8,6 +8,9 @@ import { VectorOnboarding } from "@/components/vector-onboarding";
 import { ConvoyHUD } from "@/components/convoy-hud";
 import { BuilderMarker } from "@/components/builder-marker";
 
+// ... imports ...
+import { getMapStyle } from "@/components/map-styles";
+
 // Mock builders data
 const MOCK_BUILDERS = [
   { id: 1, lat: 16.4971, lng: 80.4992, name: "VIT-AP Solar Lab", role: "Solar Research", description: "Experimental solar setups and battery testing." },
@@ -16,22 +19,6 @@ const MOCK_BUILDERS = [
 ];
 
 const MAP_ID = "DEMO_MAP_ID"; // In production, use a Map ID with "Vector" styling enabled
-const DRIVING_MAP_STYLE = [
-  {
-    "featureType": "poi",
-    "stylers": [{ "visibility": "off" }]
-  },
-  {
-    "featureType": "transit",
-    "stylers": [{ "visibility": "off" }]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.icon",
-    "stylers": [{ "visibility": "off" }]
-  }
-];
-
 
 export default function MapView() {
   const [center, setCenter] = useState({ lat: 16.4971, lng: 80.4992 });
@@ -39,6 +26,11 @@ export default function MapView() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [hasVector, setHasVector] = useState(false);
   const [filter, setFilter] = useState<"all" | "route" | "verified">("all");
+
+  const { user, userData, refreshUserData } = useAuth();
+
+  // Get custom map styles based on theme
+  const mapStyles = getMapStyle(userData?.theme || "yellow");
 
   // Get user location
   useEffect(() => {
@@ -49,7 +41,7 @@ export default function MapView() {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          // Only snap to user once initially or if tracking is enabled (simplified here)
+          // Only snap to user once initially
           if (!userLocation) {
             setCenter(pos);
             setZoom(12);
@@ -61,10 +53,7 @@ export default function MapView() {
         }
       );
     }
-  }, [userLocation]);
-
-  // Get auth state for vector saving
-  const { user, userData, refreshUserData } = useAuth();
+  }, [userLocation]); // Depending on userLocation might cause loop if not careful, but logic handles it
 
   useEffect(() => {
     if (userData?.vector) {
@@ -111,6 +100,7 @@ export default function MapView() {
           onCenterChanged={(ev) => setCenter(ev.detail.center)}
           onZoomChanged={(ev) => setZoom(ev.detail.zoom)}
           mapId={MAP_ID}
+          styles={mapStyles}
           disableDefaultUI={true}
           style={{ width: "100%", height: "100%" }}
           gestureHandling={"greedy"}
@@ -119,8 +109,14 @@ export default function MapView() {
           {userLocation && (
             <AdvancedMarker position={userLocation}>
               <div className="relative flex items-center justify-center w-8 h-8">
-                <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-main/80"></span>
-                <span className="relative inline-flex w-4 h-4 rounded-full bg-main border-2 border-white shadow-lg"></span>
+                <span
+                  className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping"
+                  style={{ backgroundColor: "var(--main)" }}
+                ></span>
+                <span
+                  className="relative inline-flex w-4 h-4 rounded-full border-2 border-white shadow-lg"
+                  style={{ backgroundColor: "var(--main)" }}
+                ></span>
 
                 {/* Heading Indicator (Mock) */}
                 <div className="absolute -top-6 bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-white">

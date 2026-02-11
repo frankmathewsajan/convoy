@@ -59,10 +59,8 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="theme-amber"
-            enableSystem={false}
+            forcedTheme="light"
             disableTransitionOnChange
-            themes={["theme-amber", "theme-blue", "theme-green", "theme-rose"]}
           >
             {children}
           </ThemeProvider>

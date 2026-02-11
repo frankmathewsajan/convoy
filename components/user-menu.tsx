@@ -36,8 +36,8 @@ import { auth, db } from "@/lib/firebase/config"; // Added db import
 import { InviteDialog } from "@/components/invite-dialog";
 
 export function UserMenu() {
-    const { user, userData, refreshUserData } = useAuth(); // Added refreshUserData
-    const { setTheme } = useTheme();
+    const { user, userData, refreshUserData, saveTheme } = useAuth(); // Added refreshUserData
+    const { setTheme: setMode } = useTheme();
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
     const [isInviteSlotOpen, setIsInviteSlotOpen] = useState(false);
     const [newName, setNewName] = useState(user?.displayName || "");
@@ -85,16 +85,18 @@ export function UserMenu() {
             <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                            <Avatar className="h-10 w-10 border-2 border-black dark:border-white">
+                        <Button
+                            className="relative h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 overflow-hidden"
+                        >
+                            <Avatar className="h-full w-full">
                                 <AvatarImage src={user.photoURL || ""} alt={user.displayName || "User"} />
-                                <AvatarFallback className="font-bold bg-amber-500 text-black">
+                                <AvatarFallback className="font-bold text-black border-2 border-black h-full w-full flex items-center justify-center" style={{ backgroundColor: "var(--main)" }}>
                                     {user.displayName?.slice(0, 2).toUpperCase() || "CN"}
                                 </AvatarFallback>
                             </Avatar>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuContent className="w-56 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" align="end" forceMount>
                         <DropdownMenuLabel className="font-normal">
                             <div className="flex flex-col space-y-1">
                                 <p className="text-sm font-medium leading-none">{user.displayName || "Nomad"}</p>
@@ -103,53 +105,57 @@ export function UserMenu() {
                                 </p>
                             </div>
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="bg-black/20" />
                         <DropdownMenuGroup>
                             <DialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="focus:bg-zinc-100 cursor-pointer">
                                     <UserIcon className="mr-2 h-4 w-4" />
                                     <span>Edit Profile</span>
                                 </DropdownMenuItem>
                             </DialogTrigger>
                         </DropdownMenuGroup>
+                        <DropdownMenuSeparator className="bg-black/20" />
+
                         <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                                <UserIcon className="mr-2 h-4 w-4" />
+                            <DropdownMenuSubTrigger className="focus:bg-zinc-100 cursor-pointer">
+                                <div className="mr-2 h-4 w-4 rounded-full" style={{ backgroundColor: "var(--main)" }} />
                                 <span>Theme</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                    <DropdownMenuItem onClick={() => setTheme("theme-amber")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-amber-500" />
+                                <DropdownMenuSubContent className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                    <DropdownMenuItem onClick={() => saveTheme("yellow")}>
+                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FACC00]" />
+                                        <span>Yellow (Default)</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => saveTheme("amber")}>
+                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FFBF00]" />
                                         <span>Amber</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setTheme("theme-blue")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-blue-500" />
-                                        <span>Blue</span>
+                                    <DropdownMenuItem onClick={() => saveTheme("rose")}>
+                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FF6678]" />
+                                        <span>Rose</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setTheme("theme-green")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-green-500" />
+                                    <DropdownMenuItem onClick={() => saveTheme("pink")}>
+                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FC64AB]" />
+                                        <span>Pink</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => saveTheme("lime")}>
+                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#8AE500]" />
+                                        <span>Lime</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => saveTheme("green")}>
+                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#00D696]" />
                                         <span>Green</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setTheme("theme-rose")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-orange-500" />
-                                        <span>Rose</span>
+                                    <DropdownMenuItem onClick={() => saveTheme("emerald")}>
+                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#00BD84]" />
+                                        <span>Emerald</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                         </DropdownMenuSub>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setIsInviteSlotOpen(true)}>
-                            <Share2 className="mr-2 h-4 w-4" />
-                            <span>Invite a Nomad</span>
-                            {userData && userData.invitesRemaining > 0 && (
-                                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-black">
-                                    {userData.invitesRemaining}
-                                </span>
-                            )}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
+                        <DropdownMenuSeparator className="bg-black/20" />
+                        <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-100 text-red-600 font-bold cursor-pointer">
                             <LogOut className="mr-2 h-4 w-4" />
                             <span>Log out</span>
                         </DropdownMenuItem>
