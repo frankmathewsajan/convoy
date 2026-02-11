@@ -85,11 +85,13 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
                 <AlertDialogContent className="border-4 border-black shadow-[8px_8px_0px_0px_#F59E0B]">
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-2xl font-black uppercase">Unlock Builder Network</AlertDialogTitle>
-                        <AlertDialogDescription className="text-base">
-                            Get unlimited access to verified mechanics, solar installers, and builders on your route.
+                        <AlertDialogDescription asChild className="text-base">
+                            <div>
+                                Get unlimited access to verified mechanics, solar installers, and builders on your route.
 
-                            <div className="mt-4 p-4 bg-zinc-50 border-2 border-zinc-200 rounded text-center font-bold text-black">
-                                Join Shipyard Pro for $4.99/mo
+                                <div className="mt-4 p-4 bg-zinc-50 border-2 border-zinc-200 rounded text-center font-bold text-black">
+                                    Join Shipyard Pro for $4.99/mo
+                                </div>
                             </div>
                         </AlertDialogDescription>
                     </AlertDialogHeader>

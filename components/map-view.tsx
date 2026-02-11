@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 import { APIProvider, Map, AdvancedMarker, useMap } from "@vis.gl/react-google-maps";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/components/auth-provider"; // Added import
 import { VectorOnboarding } from "@/components/vector-onboarding";
 import { ConvoyHUD } from "@/components/convoy-hud";
 import { BuilderMarker } from "@/components/builder-marker";
 
 // Mock builders data
 const MOCK_BUILDERS = [
-  { id: 1, lat: 37.7749, lng: -122.4194, name: "Mike's Solar", role: "Solar Installer", description: "Specializing in Renogy and Victron setups for Sprinters." },
-  { id: 2, lat: 34.0522, lng: -118.2437, name: "LA Van Works", role: "Full Build Specialist", description: "Custom cabinetry and electrical systems." },
-  { id: 3, lat: 36.1699, lng: -115.1398, name: "Vegas Diesel", role: "Mechanic", description: "Mercedes Sprinter and Ford Transit expert." },
+  { id: 1, lat: 16.4971, lng: 80.4992, name: "VIT-AP Solar Lab", role: "Solar Research", description: "Experimental solar setups and battery testing." },
+  { id: 2, lat: 16.5062, lng: 80.6480, name: "Vijayawada Van Works", role: "Full Build Specialist", description: "Custom cabinetry and electrical systems for travellers." },
+  { id: 3, lat: 16.5193, lng: 80.6115, name: "Amaravati Diesel", role: "Mechanic", description: "Expertise in heavy vehicle maintenance and repairs." },
 ];
 
 const MAP_ID = "DEMO_MAP_ID"; // In production, use a Map ID with "Vector" styling enabled
@@ -33,8 +34,8 @@ const DRIVING_MAP_STYLE = [
 
 
 export default function MapView() {
-  const [center, setCenter] = useState({ lat: 37.0902, lng: -95.7129 });
-  const [zoom, setZoom] = useState(4);
+  const [center, setCenter] = useState({ lat: 16.4971, lng: 80.4992 });
+  const [zoom, setZoom] = useState(12);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [hasVector, setHasVector] = useState(false);
   const [filter, setFilter] = useState<"all" | "route" | "verified">("all");
@@ -62,10 +63,32 @@ export default function MapView() {
     }
   }, [userLocation]);
 
-  const handleSetVector = (destination: string) => {
+  // Get auth state for vector saving
+  const { user, userData, refreshUserData } = useAuth();
+
+  useEffect(() => {
+    if (userData?.vector) {
+      setHasVector(true);
+    }
+  }, [userData]);
+
+  const handleSetVector = async (destination: string) => {
     console.log("Vector set to:", destination);
-    // In a real app, calculate route here
     setHasVector(true);
+
+    if (user) {
+      try {
+        const { doc, updateDoc } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase/config");
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          vector: destination
+        });
+        await refreshUserData();
+      } catch (error) {
+        console.error("Error saving vector:", error);
+      }
+    }
   };
 
   return (
@@ -89,7 +112,6 @@ export default function MapView() {
           onZoomChanged={(ev) => setZoom(ev.detail.zoom)}
           mapId={MAP_ID}
           disableDefaultUI={true}
-          styles={DRIVING_MAP_STYLE}
           style={{ width: "100%", height: "100%" }}
           gestureHandling={"greedy"}
         >

@@ -10,6 +10,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const publicSans = Public_Sans({
   subsets: ["latin"],
@@ -51,12 +52,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${publicSans.variable} ${dmSans.variable} ${archivo.variable} ${montserrat.variable} ${inter.variable} ${workSans.variable} ${redHatText.variable} antialiased font-public-sans`}
       >
         <AuthProvider>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="theme-amber"
+            enableSystem={false}
+            disableTransitionOnChange
+            themes={["theme-amber", "theme-blue", "theme-green", "theme-rose"]}
+          >
+            {children}
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>
