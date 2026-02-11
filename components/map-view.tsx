@@ -9,7 +9,7 @@ import { ConvoyHUD } from "@/components/convoy-hud";
 import { BuilderMarker } from "@/components/builder-marker";
 
 // ... imports ...
-import { getMapStyle } from "@/components/map-styles";
+// Removed local map style import to use cloud-based styling
 
 // Mock builders data
 const MOCK_BUILDERS = [
@@ -29,8 +29,7 @@ export default function MapView() {
 
   const { user, userData, refreshUserData } = useAuth();
 
-  // Get custom map styles based on theme
-  const mapStyles = getMapStyle(userData?.theme || "yellow");
+  // Local map styles removed for Cloud Styling support
 
   // Get user location
   useEffect(() => {
@@ -100,7 +99,7 @@ export default function MapView() {
           onCenterChanged={(ev) => setCenter(ev.detail.center)}
           onZoomChanged={(ev) => setZoom(ev.detail.zoom)}
           mapId={MAP_ID}
-          styles={mapStyles}
+          // styles prop removed for cloud styling
           disableDefaultUI={true}
           style={{ width: "100%", height: "100%" }}
           gestureHandling={"greedy"}

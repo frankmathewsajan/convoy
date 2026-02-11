@@ -1,10 +1,238 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" style="scroll-behavior: smooth;">
 <head>
-    <title>Convoy Shipyard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convoy - Van Life Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@700;800;900&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #facc00; /* yellow-400 */
+            border: 2px solid #000;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fff;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #fdf2f8; /* pink-50 */
+            background-image: 
+                radial-gradient(#000 1px, transparent 1px),
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 20px 20px, 40px 40px, 40px 40px;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        h1, h2, h3, .font-heading {
+            font-family: 'Public Sans', sans-serif;
+        }
+        .neo-shadow {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+        .neo-shadow:hover {
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+            transform: translate(2px, 2px);
+        }
+        .neo-card {
+            border: 3px solid black;
+            background-color: white;
+            padding: 2rem; /* Reduced padding */
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .neo-card:hover {
+            transform: scale(1.02) rotate(0deg) !important;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Stagger delays */
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+    </style>
 </head>
-<body>
-    <h1>Loading Convoy...</h1>
-    <p>If you see this, the App Hosting rewrite might not be active yet.</p>
+<body class="overflow-x-hidden">
+    <!-- View 1: Hero -->
+    <section class="min-h-screen flex flex-col relative border-b-4 border-black">
+        <nav class="border-b-4 border-black bg-yellow-300 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50 reveal active">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 bg-black rounded-full animate-pulse"></div>
+                <div class="text-3xl font-black tracking-tighter uppercase font-heading">Convoy</div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#pricing" class="font-black uppercase hover:text-pink-600 transition-colors hidden md:block text-sm">
+                    See Pricing
+                </a>
+                <a href="/login" class="bg-white border-2 border-black px-6 py-2 font-black uppercase neo-shadow transition-all text-black hover:bg-pink-200 text-sm md:text-base">
+                    Download App
+                </a>
+            </div>
+        </nav>
+
+        <div class="flex-grow flex flex-col justify-center items-center text-center px-4 relative pb-20">
+            <div class="max-w-4xl mx-auto space-y-8 relative z-10">
+                <div class="bg-white border-4 border-black px-6 py-2 inline-block transform -rotate-2 mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:rotate-0 transition-transform reveal active">
+                    <span class="text-xl md:text-2xl font-black uppercase tracking-widest text-pink-600">The Ultimate Co-Pilot</span>
+                </div>
+                
+                <h1 class="text-6xl md:text-8xl font-black text-black leading-none uppercase tracking-tighter mb-6 drop-shadow-sm reveal active delay-100">
+                    Make Every <br/>
+                    <span class="relative inline-block px-4 mt-2">
+                        <span class="absolute inset-0 bg-pink-400 transform -skew-x-12 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"></span>
+                        <span class="relative text-white z-10">Mile Count</span>
+                    </span>
+                </h1>
+                
+                <p class="text-lg md:text-2xl font-bold text-black max-w-2xl mx-auto border-4 border-black bg-white p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform rotate-1 mt-12 reveal active delay-200">
+                    Convoy is the safety net for the modern nomad. Connect with verified van-lifers, find safe spots, and never drive alone.
+                </p>
+            </div>
+
+            <a href="#features" class="absolute bottom-8 animate-bounce reveal active delay-300 transform hover:scale-110 transition-transform cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-black bg-yellow-300 rounded-full p-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- View 2: Features -->
+    <section id="features" class="py-20 bg-blue-200 border-b-4 border-black relative">
+        <div class="container mx-auto px-4">
+            <h2 class="text-5xl md:text-7xl font-black text-center uppercase mb-16 tracking-tighter reveal">Why Convoy?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mx-auto reveal">
+                <!-- Verified Safety -->
+                <div class="neo-card bg-white transform -rotate-1 hover:z-10 delay-100">
+                    <div class="h-20 w-20 bg-blue-300 border-4 border-black rounded-full flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3 class="text-3xl font-black uppercase mb-4 tracking-tight">Verified Safety</h3>
+                    <p class="font-bold text-lg leading-relaxed">Real-time safety pings from verified users. Know exactly where it's safe to park.</p>
+                </div>
+
+                <!-- Vibe Checks -->
+                <div class="neo-card bg-white transform rotate-1 z-20 delay-200">
+                    <div class="h-20 w-20 bg-green-300 border-4 border-black rounded-full flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5"/><path d="M16 14v0a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2v-3"/><path d="M6 14v0a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2v-3"/><path d="M16 14h-4"/><path d="M12 14v5a2 2 0 0 1-2 2"/><path d="M12 14h4"/></svg> 
+                    </div>
+                    <h3 class="text-3xl font-black uppercase mb-4 tracking-tight">Vibe Checks</h3>
+                    <p class="font-bold text-lg leading-relaxed">See who's nearby before you arrive. Connect with like-minded travelers instantly.</p>
+                </div>
+
+                <!-- Live Routing -->
+                <div class="neo-card bg-white transform -rotate-1 delay-300">
+                    <div class="h-20 w-20 bg-orange-300 border-4 border-black rounded-full flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <h3 class="text-3xl font-black uppercase mb-4 tracking-tight">Live Routing</h3>
+                    <p class="font-bold text-lg leading-relaxed">Share your live route. Get alerts if a convoy member falls behind.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 bg-white border-b-4 border-black relative reveal">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl md:text-7xl font-black uppercase mb-4 tracking-tighter">Convoy+</h2>
+            <p class="text-xl md:text-2xl font-bold mb-16 max-w-2xl mx-auto">Unlock premium features and support the community.</p>
+
+            <div class="flex flex-col lg:flex-row justify-center items-stretch gap-8 max-w-7xl mx-auto">
+                <!-- Free Plan -->
+                <div class="w-full max-w-sm bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col">
+                    <h3 class="text-3xl font-black uppercase mb-2">Free</h3>
+                    <div class="text-5xl font-black mb-6">$0 <span class="text-lg font-bold text-zinc-500">/ forever</span></div>
+                    <ul class="space-y-3 mb-8 font-bold text-lg flex-grow">
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Community Access</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Basic Routing</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Safety Alerts</li>
+                    </ul>
+                    <a href="/login" class="w-full bg-zinc-100 text-black py-4 font-black uppercase tracking-widest hover:bg-zinc-200 transition-colors border-2 border-black text-center block">Get Started</a>
+                </div>
+
+                <!-- Monthly Plan -->
+                <div class="w-full max-w-sm bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col">
+                    <div class="absolute top-0 right-0 bg-zinc-200 text-black text-xs font-black px-3 py-1 uppercase border-b-2 border-l-2 border-black">Flexible</div>
+                    <h3 class="text-3xl font-black uppercase mb-2">Monthly</h3>
+                    <div class="text-5xl font-black mb-6">$4.99 <span class="text-lg font-bold text-zinc-500">/ mo</span></div>
+                    <ul class="space-y-3 mb-8 font-bold text-lg flex-grow">
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Connect with Builders</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Unlimited Invites</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Verified Badge</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Offline Maps</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Priority Support</li>
+                    </ul>
+                    <button class="w-full bg-black text-white py-4 font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors border-2 border-black">Choose Monthly</button>
+                </div>
+
+                <!-- Yearly Plan -->
+                <div class="w-full max-w-sm bg-yellow-300 border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden transform lg:-rotate-1 hover:rotate-0 z-10 flex flex-col">
+                    <div class="absolute top-0 right-0 bg-black text-white text-xs font-black px-3 py-1 uppercase">Best Value</div>
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-3xl font-black uppercase">Yearly</h3>
+                        <span class="bg-pink-500 text-white text-xs px-2 py-1 font-black rounded border-2 border-black transform rotate-2">SAVE 12%</span>
+                    </div>
+                    <div class="text-5xl font-black mb-6">$52.99 <span class="text-lg font-bold text-black/60">/ yr</span></div>
+                    <ul class="space-y-3 mb-8 font-bold text-lg flex-grow">
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> All Pro Features</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> 2 Months Free</li>
+                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Priority Access</li>
+                    </ul>
+                    <button class="w-full bg-white text-black py-4 font-black uppercase tracking-widest hover:bg-gray-50 transition-colors border-2 border-black neo-shadow">Choose Yearly</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t-4 border-black bg-black text-white py-20 reveal">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-6xl md:text-8xl font-black uppercase mb-10 tracking-tighter hover:text-pink-500 transition-colors cursor-default">Convoy</h2>
+            <div class="flex flex-wrap justify-center gap-8 md:gap-12 font-black text-xl md:text-2xl uppercase tracking-widest mb-12">
+                <a href="#" class="hover:text-yellow-400 hover:underline decoration-4 transition-all hover:-translate-y-1 inline-block">Privacy</a>
+                <a href="#" class="hover:text-yellow-400 hover:underline decoration-4 transition-all hover:-translate-y-1 inline-block">Terms</a>
+                <a href="#" class="hover:text-yellow-400 hover:underline decoration-4 transition-all hover:-translate-y-1 inline-block">Support</a>
+            </div>
+            <p class="text-zinc-500 font-bold text-sm md:text-base uppercase tracking-widest">© 2026 Convoy Inc. Built for the Open Road.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for scroll animations
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        revealElements.forEach((el) => observer.observe(el));
+    </script>
 </body>
 </html>

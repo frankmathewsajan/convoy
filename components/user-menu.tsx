@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
-import { LogOut, User as UserIcon, Moon, Sun, Laptop, Share2 } from "lucide-react";
+import { LogOut, User as UserIcon, Moon, Sun, Laptop, Share2, ChevronDown } from "lucide-react";
 import { signOut, updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore"; // Added imports
 import { auth, db } from "@/lib/firebase/config"; // Added db import
@@ -40,6 +40,7 @@ export function UserMenu() {
     const { setTheme: setMode } = useTheme();
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
     const [isInviteSlotOpen, setIsInviteSlotOpen] = useState(false);
+    const [showThemes, setShowThemes] = useState(false);
     const [newName, setNewName] = useState(user?.displayName || "");
     const [newPhotoURL, setNewPhotoURL] = useState(user?.photoURL || "");
     const [loading, setLoading] = useState(false);
@@ -86,17 +87,17 @@ export function UserMenu() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
-                            className="relative h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 overflow-hidden"
+                            className="relative h-12 w-12 rounded-full border-2 border-black shadow-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 overflow-hidden"
                         >
                             <Avatar className="h-full w-full">
                                 <AvatarImage src={user.photoURL || ""} alt={user.displayName || "User"} />
                                 <AvatarFallback className="font-bold text-black border-2 border-black h-full w-full flex items-center justify-center" style={{ backgroundColor: "var(--main)" }}>
-                                    {user.displayName?.slice(0, 2).toUpperCase() || "CN"}
+                                    <UserIcon className="h-6 w-6" />
                                 </AvatarFallback>
                             </Avatar>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" align="end" forceMount>
+                    <DropdownMenuContent className="w-56 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" align="end" forceMount sideOffset={20}>
                         <DropdownMenuLabel className="font-normal">
                             <div className="flex flex-col space-y-1">
                                 <p className="text-sm font-medium leading-none">{user.displayName || "Nomad"}</p>
@@ -116,44 +117,52 @@ export function UserMenu() {
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator className="bg-black/20" />
 
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="focus:bg-zinc-100 cursor-pointer">
+                        <DropdownMenuItem
+                            onSelect={(e) => {
+                                e.preventDefault();
+                                setShowThemes(!showThemes);
+                            }}
+                            className="focus:bg-zinc-100 cursor-pointer justify-between group"
+                        >
+                            <div className="flex items-center">
                                 <div className="mr-2 h-4 w-4 rounded-full" style={{ backgroundColor: "var(--main)" }} />
                                 <span>Theme</span>
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuPortal>
-                                <DropdownMenuSubContent className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                    <DropdownMenuItem onClick={() => saveTheme("yellow")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FACC00]" />
-                                        <span>Yellow (Default)</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => saveTheme("amber")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FFBF00]" />
-                                        <span>Amber</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => saveTheme("rose")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FF6678]" />
-                                        <span>Rose</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => saveTheme("pink")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#FC64AB]" />
-                                        <span>Pink</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => saveTheme("lime")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#8AE500]" />
-                                        <span>Lime</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => saveTheme("green")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#00D696]" />
-                                        <span>Green</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => saveTheme("emerald")}>
-                                        <div className="mr-2 h-4 w-4 rounded-full bg-[#00BD84]" />
-                                        <span>Emerald</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                        </DropdownMenuSub>
+                            </div>
+                            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showThemes ? "rotate-180" : ""}`} />
+                        </DropdownMenuItem>
+
+                        {showThemes && (
+                            <>
+                                <DropdownMenuItem onClick={() => saveTheme("yellow")} className="pl-8 focus:bg-zinc-100 cursor-pointer">
+                                    <div className="mr-2 h-4 w-4 rounded-full bg-[#FACC00]" />
+                                    <span>Yellow (Default)</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => saveTheme("amber")} className="pl-8 focus:bg-zinc-100 cursor-pointer">
+                                    <div className="mr-2 h-4 w-4 rounded-full bg-[#FFBF00]" />
+                                    <span>Amber</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => saveTheme("rose")} className="pl-8 focus:bg-zinc-100 cursor-pointer">
+                                    <div className="mr-2 h-4 w-4 rounded-full bg-[#FF6678]" />
+                                    <span>Rose</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => saveTheme("pink")} className="pl-8 focus:bg-zinc-100 cursor-pointer">
+                                    <div className="mr-2 h-4 w-4 rounded-full bg-[#FC64AB]" />
+                                    <span>Pink</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => saveTheme("lime")} className="pl-8 focus:bg-zinc-100 cursor-pointer">
+                                    <div className="mr-2 h-4 w-4 rounded-full bg-[#8AE500]" />
+                                    <span>Lime</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => saveTheme("green")} className="pl-8 focus:bg-zinc-100 cursor-pointer">
+                                    <div className="mr-2 h-4 w-4 rounded-full bg-[#00D696]" />
+                                    <span>Green</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => saveTheme("emerald")} className="pl-8 focus:bg-zinc-100 cursor-pointer">
+                                    <div className="mr-2 h-4 w-4 rounded-full bg-[#00BD84]" />
+                                    <span>Emerald</span>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                         <DropdownMenuSeparator className="bg-black/20" />
                         <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-100 text-red-600 font-bold cursor-pointer">
                             <LogOut className="mr-2 h-4 w-4" />
