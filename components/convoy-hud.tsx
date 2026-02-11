@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Map as MapIcon, Users, Heart, X, Check, Undo2, Info } from "lucide-react";
+import { ShieldCheck, Map as MapIcon, Users, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/user-menu";
-import { PaywallModal } from "@/components/paywall-modal";
 import {
     Dialog,
     DialogContent,
@@ -14,24 +13,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 
 type FilterType = "all" | "route" | "verified";
-
-interface Profile {
-    id: number;
-    name: string;
-    age: number;
-    description: string;
-    image: string;
-    distance: string;
-}
-
-const DUMMY_PROFILES: Profile[] = [
-    { id: 1, name: "Sarah & Mike", age: 28, description: "Vanlifers exploring the coast. Love surfing & coffee.", image: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", distance: "2 miles away" },
-    { id: 2, name: "Alex", age: 32, description: "Solo traveler with a dog named Buster. Hiking enthusiast.", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", distance: "5 miles away" },
-    { id: 3, name: "The Wanderlust Fam", age: 35, description: "Full-time family on the road. Kids love playdates!", image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", distance: "8 miles away" },
-    { id: 4, name: "Jessica", age: 26, description: "Digital nomad looking for good wifi and better company.", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", distance: "12 miles away" },
-];
 
 interface ConvoyHUDProps {
     activeFilter: FilterType;
@@ -41,31 +25,6 @@ interface ConvoyHUDProps {
 
 export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount }: ConvoyHUDProps) {
     const [isSafetyDetailsOpen, setIsSafetyDetailsOpen] = useState(false);
-    const [isSocialOpen, setIsSocialOpen] = useState(false);
-    const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
-    const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-
-    // Logic for Paywall Trigger
-    const handleRewind = () => {
-        // Trigger Paywall for rewind action (Simulating non-pro user)
-        setIsPaywallOpen(true);
-    };
-
-    const handleSkip = () => {
-        if (currentProfileIndex < DUMMY_PROFILES.length - 1) {
-            setCurrentProfileIndex(prev => prev + 1);
-        } else {
-            setCurrentProfileIndex(0); // Loop back for demo
-        }
-    };
-
-    const handleConnect = () => {
-        // Here we would send a connection request
-        alert(`Request sent to ${DUMMY_PROFILES[currentProfileIndex].name}!`);
-        handleSkip();
-    };
-
-    const currentProfile = DUMMY_PROFILES[currentProfileIndex];
 
     const SafetyPing = ({ mobile = false }: { mobile?: boolean }) => (
         <Dialog open={isSafetyDetailsOpen} onOpenChange={setIsSafetyDetailsOpen}>
@@ -98,82 +57,17 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount }: ConvoyH
     );
 
     const SocialTrigger = () => (
-        <Dialog open={isSocialOpen} onOpenChange={setIsSocialOpen}>
-            <DialogTrigger asChild>
-                <Button
-                    className="pointer-events-auto h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
-                >
-                    <Heart className="h-6 w-6 fill-current" style={{ color: "var(--main)" }} />
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-sm sm:max-w-md p-0 overflow-hidden bg-gray-50">
-                {/* Profile Card Stack */}
-                <div className="relative h-[500px] w-full flex flex-col">
-                    {/* Image & Overlay */}
-                    <div className="relative flex-grow bg-black">
-                        <img
-                            src={currentProfile.image}
-                            alt={currentProfile.name}
-                            className="absolute inset-0 w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-
-                        <div className="absolute bottom-20 left-6 text-white text-left">
-                            <h3 className="text-3xl font-black drop-shadow-md">{currentProfile.name}, {currentProfile.age}</h3>
-                            <p className="font-bold text-gray-200 drop-shadow-md flex items-center gap-1">
-                                <MapIcon className="h-4 w-4" /> {currentProfile.distance}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Description Section */}
-                    <div className="bg-white p-6 border-t-2 border-black text-left">
-                        <p className="text-gray-600 font-medium mb-4 line-clamp-2">{currentProfile.description}</p>
-                    </div>
-
-                    {/* Actions Bar */}
-                    <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-6 px-4">
-                        {/* Rewind (Paywall Trigger) */}
-                        <Button
-                            onClick={handleRewind}
-                            className="h-12 w-12 rounded-full border-2 border-black bg-yellow-400 text-black hover:bg-yellow-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center transition-transform active:scale-95"
-                        >
-                            <Undo2 className="h-6 w-6" />
-                        </Button>
-
-                        {/* Skip */}
-                        <Button
-                            onClick={handleSkip}
-                            className="h-14 w-14 rounded-full border-2 border-black bg-white text-red-500 hover:bg-red-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center transition-transform active:scale-95"
-                        >
-                            <X className="h-8 w-8" />
-                        </Button>
-
-                        {/* Connect */}
-                        <Button
-                            onClick={handleConnect}
-                            className="h-14 w-14 rounded-full border-2 border-black bg-white text-green-500 hover:bg-green-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center transition-transform active:scale-95"
-                        >
-                            <Check className="h-8 w-8" />
-                        </Button>
-
-                        {/* Info/Details */}
-                        <Button
-                            variant="ghost"
-                            className="h-10 w-10 rounded-full text-white/80 hover:bg-white/20 absolute top-4 right-4"
-                        >
-                            <Info className="h-6 w-6" />
-                        </Button>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+        <Link href="/vibe">
+            <Button
+                className="pointer-events-auto h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
+            >
+                <Heart className="h-6 w-6 fill-current" style={{ color: "var(--main)" }} />
+            </Button>
+        </Link>
     );
 
     return (
         <>
-            <PaywallModal open={isPaywallOpen} onClose={() => setIsPaywallOpen(false)} />
-
             {/* Top Bar (Filters & Safety Ping) */}
             <div className="absolute top-4 left-4 right-4 z-40 flex justify-between items-start pointer-events-none">
                 {/* Filters (Left) */}
@@ -206,6 +100,7 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount }: ConvoyH
                 <div className="flex items-center gap-4">
                     {/* Desktop User Menu & Social */}
                     <div className="hidden md:flex items-center gap-4 pointer-events-auto">
+                        <SafetyPing />
                         <SocialTrigger />
                         <UserMenu />
                     </div>
@@ -215,9 +110,10 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount }: ConvoyH
             {/* Mobile Bottom Bar (Social & User Menu) */}
             <div className="absolute bottom-6 left-4 right-4 z-40 flex md:hidden justify-between items-end pointer-events-none">
                 <div className="pointer-events-auto">
-                    <SocialTrigger />
+                    <SafetyPing mobile />
                 </div>
-                <div className="pointer-events-auto">
+                <div className="flex items-center gap-4 pointer-events-auto">
+                    <SocialTrigger />
                     <UserMenu />
                 </div>
             </div>

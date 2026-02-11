@@ -7,6 +7,7 @@ import {
   Inter,
   Work_Sans,
   Red_Hat_Text,
+  Bungee_Outline,
 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth-provider";
@@ -40,6 +41,11 @@ const redHatText = Red_Hat_Text({
   subsets: ["latin"],
   variable: "--font-red-hat-text",
 });
+const bungeeOutline = Bungee_Outline({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bungee-outline",
+});
 
 export const metadata: Metadata = {
   title: "Convoy",
@@ -54,7 +60,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${publicSans.variable} ${dmSans.variable} ${archivo.variable} ${montserrat.variable} ${inter.variable} ${workSans.variable} ${redHatText.variable} antialiased font-public-sans`}
+        className={`${publicSans.variable} ${dmSans.variable} ${archivo.variable} ${montserrat.variable} ${inter.variable} ${workSans.variable} ${redHatText.variable} ${bungeeOutline.variable} antialiased font-public-sans`}
       >
         <AuthProvider>
           <ThemeProvider
