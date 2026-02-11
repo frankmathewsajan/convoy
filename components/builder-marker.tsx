@@ -1,0 +1,106 @@
+/// <reference types="google.maps" />
+"use client";
+
+import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Hammer, MessageSquare, Navigation, X } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+interface BuilderMarkerProps {
+    position: google.maps.LatLngLiteral;
+    name: string;
+    role: string;
+    description: string;
+}
+
+export function BuilderMarker({ position, name, role, description }: BuilderMarkerProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [showPaywall, setShowPaywall] = useState(false);
+
+    const handlePaywallTrigger = () => {
+        setShowPaywall(true);
+    };
+
+    return (
+        <>
+            <AdvancedMarker position={position} onClick={() => setIsOpen(true)}>
+                <div className="relative group cursor-pointer">
+                    <Pin background={"#F59E0B"} borderColor={"#000"} glyphColor={"#000"} scale={1.2} />
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-1 bg-black/20 blur-sm rounded-full"></div>
+                </div>
+            </AdvancedMarker>
+
+            {isOpen && (
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[320px] z-50">
+                    <Card className="border-4 border-amber-500 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white relative overflow-hidden">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                            className="absolute top-2 right-2 p-1 hover:bg-zinc-100 rounded-full"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+
+                        <div className="absolute top-0 left-0 w-full h-1.5 bg-amber-500"></div>
+
+                        <CardHeader className="pb-2">
+                            <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-widest mb-1">
+                                <Hammer className="h-3 w-3" /> Verified Builder
+                            </div>
+                            <CardTitle className="text-xl font-black">{name}</CardTitle>
+                            <CardDescription className="font-medium text-black">{role}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="pb-4">
+                            <p className="text-sm text-zinc-600">{description}</p>
+                        </CardContent>
+                        <CardFooter className="grid grid-cols-2 gap-2">
+                            <Button
+                                onClick={handlePaywallTrigger}
+                                className="w-full bg-zinc-100 text-black border-2 border-black hover:bg-zinc-200"
+                            >
+                                <MessageSquare className="h-4 w-4 mr-2" /> Message
+                            </Button>
+                            <Button
+                                onClick={handlePaywallTrigger}
+                                className="w-full bg-amber-500 text-black border-2 border-black hover:bg-amber-400"
+                            >
+                                <Navigation className="h-4 w-4 mr-2" /> Navigate
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </div>
+            )}
+
+            <AlertDialog open={showPaywall} onOpenChange={setShowPaywall}>
+                <AlertDialogContent className="border-4 border-black shadow-[8px_8px_0px_0px_#F59E0B]">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-black uppercase">Unlock Builder Network</AlertDialogTitle>
+                        <AlertDialogDescription className="text-base">
+                            Get unlimited access to verified mechanics, solar installers, and builders on your route.
+
+                            <div className="mt-4 p-4 bg-zinc-50 border-2 border-zinc-200 rounded text-center font-bold text-black">
+                                Join Shipyard Pro for $4.99/mo
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="border-2 border-black">Cancel</AlertDialogCancel>
+                        <AlertDialogAction className="bg-amber-500 text-black border-2 border-black hover:bg-amber-400 font-bold">
+                            Unlock Now
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
+    );
+}
