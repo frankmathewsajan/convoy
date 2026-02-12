@@ -2,10 +2,21 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-// ... imports
-import { ShieldCheck, Map as MapIcon, Users, Heart, Settings, Palette, Layers, Edit2, LocateFixed } from "lucide-react"; // Added LocateFixed
+import { ShieldCheck, Map as MapIcon, Users, Heart, Settings, Palette, Layers, Edit2, LocateFixed } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { UserMenu } from "@/components/user-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import Link from "next/link";
+import { MapStyleOptions, MapStyleMode } from "@/components/map-styles";
+import { Slider } from "@/components/ui/slider";
 
-// ...
+type FilterType = "all" | "route" | "verified";
 
 interface ConvoyHUDProps {
     activeFilter: FilterType;
@@ -13,76 +24,8 @@ interface ConvoyHUDProps {
     safetyCount: number;
     mapSettings: MapStyleOptions;
     onMapSettingsChange: (settings: MapStyleOptions) => void;
-    onCenterMap: () => void; // Added prop
+    onCenterMap: () => void;
 }
-
-// ... SettingsDialog ...
-
-return (
-    <>
-        <SettingsDialog />
-
-        {/* Top Bar (Filters) */}
-        <div className="absolute top-14 left-4 right-4 z-40 flex justify-between items-start pointer-events-none">
-            {/* Filters (Left) */}
-            <div className="pointer-events-auto flex items-center gap-2 rounded-lg border-2 border-black bg-white p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <FilterButton
-                    active={activeFilter === "all"}
-                    onClick={() => onFilterChange("all")}
-                    icon={<Users className="h-4 w-4" />}
-                    label="all"
-                    fullLabel="All Nomads"
-                />
-                <FilterButton
-                    active={activeFilter === "route"}
-                    onClick={() => onFilterChange("route")}
-                    icon={<MapIcon className="h-4 w-4" />}
-                    label="route"
-                    fullLabel="On Route"
-                />
-                <FilterButton
-                    active={activeFilter === "verified"}
-                    onClick={() => onFilterChange("verified")}
-                    icon={<ShieldCheck className="h-4 w-4" />}
-                    label="verified"
-                    fullLabel="Verified"
-                    badge={safetyCount}
-                />
-            </div>
-
-            {/* Right Side (Desktop: Social + User + Center) */}
-            <div className="hidden md:flex items-center gap-4 pointer-events-auto">
-                <Button
-                    onClick={onCenterMap}
-                    className="h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
-                >
-                    <LocateFixed className="h-6 w-6" />
-                </Button>
-                <SocialTrigger />
-                <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
-            </div>
-        </div>
-
-        {/* Mobile Bottom Bar (Social Left, User Right) */}
-        <div className="absolute bottom-6 left-4 right-4 z-40 flex md:hidden justify-between items-end pointer-events-none">
-            <div className="pointer-events-auto flex flex-col gap-4">
-                {/* Center Button on Mobile (Left side above Social) */}
-                <Button
-                    onClick={onCenterMap}
-                    className="h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
-                >
-                    <LocateFixed className="h-6 w-6" />
-                </Button>
-                <SocialTrigger />
-            </div>
-            <div className="pointer-events-auto">
-                <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
-            </div>
-        </div>
-    </>
-);
-}
-
 
 const SocialTrigger = () => (
     <Link href="/vibe">
@@ -94,11 +37,7 @@ const SocialTrigger = () => (
     </Link>
 );
 
-import { Slider } from "@/components/ui/slider"; // Added import
-
-// ... imports ...
-
-export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettings, onMapSettingsChange }: ConvoyHUDProps) {
+export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettings, onMapSettingsChange, onCenterMap }: ConvoyHUDProps) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const SettingsDialog = () => (

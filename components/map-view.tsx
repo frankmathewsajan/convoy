@@ -110,6 +110,25 @@ export default function MapView() {
     }
   };
 
+  const handleSetVector = async (destination: string) => {
+    console.log("Vector set to:", destination);
+    setHasVector(true);
+
+    if (user) {
+      try {
+        const { doc, updateDoc } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase/config");
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          vector: destination
+        });
+        await refreshUserData();
+      } catch (error) {
+        console.error("Error saving vector:", error);
+      }
+    }
+  };
+
   // ...
 
   return (
