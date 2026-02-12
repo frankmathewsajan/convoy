@@ -48,21 +48,28 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isInvited, setIsInvited] = useState(false); // Should check status from DB
 
+    // Cleanup reCAPTCHA on unmount
     useEffect(() => {
-        // Initialize RecaptchaVerifier on mount
-        if (typeof window !== "undefined" && !window.recaptchaVerifier) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-                size: "invisible",
-                callback: () => {
-                    // reCAPTCHA solved - allowing signInWithPhoneNumber to proceed automatically
-                },
-                "expired-callback": () => {
-                    // Response expired. Ask user to solve reCAPTCHA again.
-                    setError("reCAPTCHA expired, please try again.");
-                },
-            });
-        }
+        return () => {
+            if (typeof window !== "undefined" && window.recaptchaVerifier) {
+                try { window.recaptchaVerifier.clear(); } catch { /* ignore */ }
+                window.recaptchaVerifier = undefined;
+            }
+        };
     }, []);
+
+    // Lazy-init reCAPTCHA: only create it right before we need it
+    const getOrCreateRecaptcha = (): RecaptchaVerifier => {
+        if (window.recaptchaVerifier) {
+            try { window.recaptchaVerifier.clear(); } catch { /* ignore */ }
+            window.recaptchaVerifier = undefined;
+        }
+        const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+            size: "invisible",
+        });
+        window.recaptchaVerifier = verifier;
+        return verifier;
+    };
 
     const handleInviteSubmit = () => {
         if (inviteCode === "CONVOY2026") {
@@ -79,7 +86,6 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            // Wait for AuthProvider to update user state, but we can optimistically redirect or show invite
             if (isInvited) {
                 router.push("/map");
             }
@@ -93,27 +99,27 @@ export default function LoginPage() {
     const handlePhoneLogin = async () => {
         setError("");
         setIsLoading(true);
-        const appVerifier = window.recaptchaVerifier;
-
-        if (!appVerifier) {
-            setError("ReCAPTCHA not initialized. Please refresh the page.");
-            setIsLoading(false);
-            return;
-        }
 
         try {
+            // Create a fresh reCAPTCHA verifier each time to avoid timeouts
+            const appVerifier = getOrCreateRecaptcha();
             const fullPhoneNumber = `${countryCode}${phoneNumber}`;
             const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
             setConfirmationResult(confirmation);
         } catch (err: any) {
             console.error(err);
-            setError("Failed to send code. Make sure phone number is in E.164 format (e.g. +15555555555)");
-            // Reset reCAPTCHA so user can try again
+            const msg = err?.code === "auth/invalid-phone-number"
+                ? "Invalid phone number format. Please check and try again."
+                : err?.code === "auth/too-many-requests"
+                    ? "Too many attempts. Please wait a moment and try again."
+                    : err?.code === "auth/quota-exceeded"
+                        ? "SMS quota exceeded. Please try again later."
+                        : "Failed to send verification code. Please try again.";
+            setError(msg);
+            // Clean up the failed verifier so a fresh one is created next attempt
             if (window.recaptchaVerifier) {
-                window.recaptchaVerifier.clear();
-                // Re-init happens on reload or we'd need to re-create it. 
-                // For simplicity, asking user to refresh or re-rendering logic could be needed.
-                // But clear() usually allows re-rendering if we handle it right.
+                try { window.recaptchaVerifier.clear(); } catch { /* ignore */ }
+                window.recaptchaVerifier = undefined;
             }
         } finally {
             setIsLoading(false);
