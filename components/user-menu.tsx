@@ -29,13 +29,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
-import { LogOut, User as UserIcon, Moon, Sun, Laptop, Share2, ChevronDown, Settings } from "lucide-react";
+import { LogOut, User as UserIcon, Moon, Sun, Laptop, Share2, ChevronDown, Settings, Navigation } from "lucide-react";
 import { signOut, updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore"; // Added imports
 import { auth, db } from "@/lib/firebase/config"; // Added db import
 import { InviteDialog } from "@/components/invite-dialog";
 
-export function UserMenu({ onOpenMapEditor }: { onOpenMapEditor: () => void }) {
+export function UserMenu({ onOpenMapEditor, onEditVector }: { onOpenMapEditor: () => void; onEditVector: () => void }) {
     const { user, userData, refreshUserData, saveTheme } = useAuth(); // Added refreshUserData
     const { setTheme: setMode } = useTheme();
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -117,6 +117,10 @@ export function UserMenu({ onOpenMapEditor }: { onOpenMapEditor: () => void }) {
                             <DropdownMenuItem onClick={onOpenMapEditor} className="focus:bg-zinc-100 cursor-pointer">
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Map Editor</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={onEditVector} className="focus:bg-zinc-100 cursor-pointer">
+                                <Navigation className="mr-2 h-4 w-4" />
+                                <span>Edit Vector</span>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator className="bg-black/20" />

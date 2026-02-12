@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import {
     Card,
     CardContent,
@@ -12,12 +13,12 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Navigation } from "lucide-react";
-
 interface VectorOnboardingProps {
     onSetVector: (destination: string) => void;
+    className?: string; // Added className prop
 }
 
-export function VectorOnboarding({ onSetVector }: VectorOnboardingProps) {
+export function VectorOnboarding({ onSetVector, className }: VectorOnboardingProps) {
     const [destination, setDestination] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -28,7 +29,7 @@ export function VectorOnboarding({ onSetVector }: VectorOnboardingProps) {
     };
 
     return (
-        <div className="absolute bottom-0 left-0 right-0 z-50 p-4 transition-transform duration-300 ease-in-out md:bottom-8 md:left-1/2 md:w-[400px] md:-translate-x-1/2">
+        <div className={cn("w-full max-w-sm p-4", className)}>
             <Card className="border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white dark:bg-zinc-900 dark:border-white dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl font-black uppercase">

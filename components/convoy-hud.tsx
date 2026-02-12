@@ -25,6 +25,7 @@ interface ConvoyHUDProps {
     mapSettings: MapStyleOptions;
     onMapSettingsChange: (settings: MapStyleOptions) => void;
     onCenterMap: () => void;
+    onEditVector: () => void; // Added prop
 }
 
 const SocialTrigger = () => (
@@ -37,7 +38,7 @@ const SocialTrigger = () => (
     </Link>
 );
 
-export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettings, onMapSettingsChange, onCenterMap }: ConvoyHUDProps) {
+export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettings, onMapSettingsChange, onCenterMap, onEditVector }: ConvoyHUDProps) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const SettingsDialog = () => (
@@ -168,20 +169,40 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettin
                     />
                 </div>
 
-                {/* Right Side (Desktop: Social + User) */}
+                {/* Right Side (Desktop: Social + Center + User) */}
                 <div className="hidden md:flex items-center gap-4 pointer-events-auto">
                     <SocialTrigger />
-                    <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
+                    {/* Center Map Button */}
+                    <Button
+                        onClick={onCenterMap}
+                        className="h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
+                    >
+                        <LocateFixed className="h-6 w-6" />
+                    </Button>
+                    <UserMenu
+                        onOpenMapEditor={() => setIsSettingsOpen(true)}
+                        onEditVector={onEditVector} // Pass prop
+                    />
                 </div>
             </div>
 
             {/* Mobile Bottom Bar (Social Left, User Right) */}
             <div className="absolute bottom-6 left-4 right-4 z-40 flex md:hidden justify-between items-end pointer-events-none">
-                <div className="pointer-events-auto">
+                <div className="pointer-events-auto flex flex-col gap-4">
+                    {/* Center Button on Mobile (Left side above Social) */}
+                    <Button
+                        onClick={onCenterMap}
+                        className="h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
+                    >
+                        <LocateFixed className="h-6 w-6" />
+                    </Button>
                     <SocialTrigger />
                 </div>
                 <div className="pointer-events-auto">
-                    <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
+                    <UserMenu
+                        onOpenMapEditor={() => setIsSettingsOpen(true)}
+                        onEditVector={onEditVector} // Pass prop
+                    />
                 </div>
             </div>
         </>

@@ -59,8 +59,6 @@ const MOCK_BUILDERS = [
   { id: 3, lat: 16.5193, lng: 80.6115, name: "Amaravati Diesel", role: "Mechanic", description: "Expertise in heavy vehicle maintenance and repairs." },
 ];
 
-const MAP_ID = "DEMO_MAP_ID"; // In production, use a Map ID with "Vector" styling enabled
-
 export default function MapView() {
   const [center, setCenter] = useState({ lat: 16.4971, lng: 80.4992 });
   const [zoom, setZoom] = useState(12);
@@ -77,11 +75,20 @@ export default function MapView() {
     labelDensity: 3
   });
 
-  const { user, userData, refreshUserData } = useAuth();
+  const [isEditingVector, setIsEditingVector] = useState(false); // Added state
+
+  const { user, userData, refreshUserData, loading } = useAuth(); // Added loading
   const { theme, resolvedTheme } = useTheme();
 
-  // Load Map Settings from Local Storage on Mount
+  // Load Map Settings from Local Storage OR Firebase on Mount/Update
   useEffect(() => {
+    // 1. Try Firebase first (Source of Truth)
+    if (userData?.mapSettings) {
+      setMapSettings((prev) => ({ ...prev, ...userData.mapSettings }));
+      return;
+    }
+
+    // 2. Fallback to Local Storage
     const savedSettings = localStorage.getItem("convoy-map-settings");
     if (savedSettings) {
       try {
@@ -90,12 +97,31 @@ export default function MapView() {
         console.error("Failed to parse map settings", e);
       }
     }
-  }, []);
+  }, [userData]); // Run when userData loads
 
-  // Save Map Settings to Local Storage
+  // Save Map Settings to Local Storage AND Firebase (Debounced)
   useEffect(() => {
+    // Local Storage (Instant)
     localStorage.setItem("convoy-map-settings", JSON.stringify(mapSettings));
-  }, [mapSettings]);
+
+    // Firebase (Debounced)
+    const saveToFirebase = async () => {
+      if (!user) return;
+      try {
+        const { doc, updateDoc } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase/config");
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          mapSettings: mapSettings
+        });
+      } catch (error) {
+        console.error("Error syncing map settings to cloud:", error);
+      }
+    };
+
+    const timeoutId = setTimeout(saveToFirebase, 1000); // 1s debounce
+    return () => clearTimeout(timeoutId);
+  }, [mapSettings, user]);
 
   const mapStyles = getMapStyle(theme, resolvedTheme === "dark" ? "dark" : "light", mapSettings);
 
@@ -113,6 +139,7 @@ export default function MapView() {
   const handleSetVector = async (destination: string) => {
     console.log("Vector set to:", destination);
     setHasVector(true);
+    setIsEditingVector(false); // Close editor
 
     if (user) {
       try {
@@ -129,7 +156,34 @@ export default function MapView() {
     }
   };
 
-  // ...
+  // Get user location
+  useEffect(() => {
+    let watchId: number;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          // Only snap to user once initially (we check if it was null before)
+          setUserLocation((prev) => {
+            if (!prev) {
+              setCenter(pos);
+              setZoom(12);
+            }
+            return pos;
+          });
+        },
+        (error) => {
+          console.error("Error getting location: ", error);
+        }
+      );
+    }
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+    };
+  }, []); // Empty dependency array to run once
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}>
@@ -143,6 +197,7 @@ export default function MapView() {
           mapSettings={mapSettings}
           onMapSettingsChange={setMapSettings}
           onCenterMap={handleCenterMap}
+          onEditVector={() => setIsEditingVector(true)} // Pass handler
         />
 
         {/* Map */}
@@ -153,9 +208,6 @@ export default function MapView() {
           zoom={zoom}
           onCenterChanged={(ev) => setCenter(ev.detail.center)}
           onZoomChanged={(ev) => setZoom(ev.detail.zoom)}
-          mapId={null} // Remove Map ID to enforce local styles if needed, or keep it if concurrent. 
-          // For local styles to work fully, we might need to remove MapId or ensure it doesn't conflict. 
-          // But user asked for local styling. nulling mapId ensures local JSON works.
           styles={mapStyles}
           disableDefaultUI={true}
           style={{ width: "100%", height: "100%" }}
@@ -163,21 +215,17 @@ export default function MapView() {
         >
           {/* User Location Pulse */}
           {userLocation && (
-            <CustomOverlay position={userLocation} zIndex={100}>
-              <div className="relative flex items-center justify-center w-8 h-8">
+            <CustomOverlay position={userLocation} zIndex={100} anchor="center">
+              <div className="relative flex items-center justify-center w-12 h-12">
                 <span
-                  className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping"
+                  className="absolute inline-flex w-full h-full rounded-full opacity-50 animate-ping"
                   style={{ backgroundColor: "var(--main)" }}
                 ></span>
                 <span
-                  className="relative inline-flex w-4 h-4 rounded-full border-2 border-white shadow-lg"
+                  className="relative inline-flex w-5 h-5 rounded-full border-4 border-white shadow-xl"
                   style={{ backgroundColor: "var(--main)" }}
                 ></span>
-
-                {/* Heading Indicator (Mock) */}
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-white whitespace-nowrap">
-                  YOU
-                </div>
+                {/* Direction Arrow (Optional) */}
               </div>
             </CustomOverlay>
           )}
@@ -195,9 +243,21 @@ export default function MapView() {
 
         </Map>
 
-        {/* Vector Onboarding (Show if no vector set) */}
-        {!hasVector && (
-          <VectorOnboarding onSetVector={handleSetVector} />
+        {/* Vector Onboarding (Show if no vector set AND not loading, OR if editing) */}
+        {((!hasVector && !loading) || isEditingVector) && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="relative w-full max-w-sm">
+              {isEditingVector && (
+                <button
+                  onClick={() => setIsEditingVector(false)}
+                  className="absolute -top-8 right-0 text-white font-bold uppercase text-xs hover:underline"
+                >
+                  Cancel
+                </button>
+              )}
+              <VectorOnboarding onSetVector={handleSetVector} />
+            </div>
+          </div>
         )}
       </div>
     </APIProvider>

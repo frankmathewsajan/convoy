@@ -5,6 +5,8 @@ import { User, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase/config";
 
+import { MapStyleOptions } from "./map-styles";
+
 interface UserData {
   invitesRemaining: number;
   vector: string | null;
@@ -13,6 +15,7 @@ interface UserData {
   displayName: string | null;
   photoURL: string | null;
   theme?: string;
+  mapSettings?: MapStyleOptions;
 }
 
 interface AuthContextType {
