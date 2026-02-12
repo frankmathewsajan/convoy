@@ -2,74 +2,207 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Map as MapIcon, Users, Heart } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { UserMenu } from "@/components/user-menu";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import Link from "next/link";
+// ... imports
+import { ShieldCheck, Map as MapIcon, Users, Heart, Settings, Palette, Layers, Edit2, LocateFixed } from "lucide-react"; // Added LocateFixed
 
-type FilterType = "all" | "route" | "verified";
+// ...
 
 interface ConvoyHUDProps {
     activeFilter: FilterType;
     onFilterChange: (filter: FilterType) => void;
     safetyCount: number;
+    mapSettings: MapStyleOptions;
+    onMapSettingsChange: (settings: MapStyleOptions) => void;
+    onCenterMap: () => void; // Added prop
 }
 
-export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount }: ConvoyHUDProps) {
-    const [isSafetyDetailsOpen, setIsSafetyDetailsOpen] = useState(false);
+// ... SettingsDialog ...
 
-    const SafetyPing = ({ mobile = false }: { mobile?: boolean }) => (
-        <Dialog open={isSafetyDetailsOpen} onOpenChange={setIsSafetyDetailsOpen}>
-            <DialogTrigger asChild>
-                <div
-                    className={cn(
-                        "pointer-events-auto flex items-center gap-3 rounded-full border-2 border-black font-bold text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:border-white dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1/0.5)] cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-white",
-                        mobile ? "px-3 py-1.5 text-xs" : "px-4 py-2"
-                    )}
-                    style={{ backgroundColor: "var(--main)" }}
+return (
+    <>
+        <SettingsDialog />
+
+        {/* Top Bar (Filters) */}
+        <div className="absolute top-14 left-4 right-4 z-40 flex justify-between items-start pointer-events-none">
+            {/* Filters (Left) */}
+            <div className="pointer-events-auto flex items-center gap-2 rounded-lg border-2 border-black bg-white p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <FilterButton
+                    active={activeFilter === "all"}
+                    onClick={() => onFilterChange("all")}
+                    icon={<Users className="h-4 w-4" />}
+                    label="all"
+                    fullLabel="All Nomads"
+                />
+                <FilterButton
+                    active={activeFilter === "route"}
+                    onClick={() => onFilterChange("route")}
+                    icon={<MapIcon className="h-4 w-4" />}
+                    label="route"
+                    fullLabel="On Route"
+                />
+                <FilterButton
+                    active={activeFilter === "verified"}
+                    onClick={() => onFilterChange("verified")}
+                    icon={<ShieldCheck className="h-4 w-4" />}
+                    label="verified"
+                    fullLabel="Verified"
+                    badge={safetyCount}
+                />
+            </div>
+
+            {/* Right Side (Desktop: Social + User + Center) */}
+            <div className="hidden md:flex items-center gap-4 pointer-events-auto">
+                <Button
+                    onClick={onCenterMap}
+                    className="h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
                 >
-                    <div className={cn("relative flex", mobile ? "h-2 w-2" : "h-3 w-3")}>
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-black opacity-75"></span>
-                        <span className="relative inline-flex h-full w-full rounded-full bg-black"></span>
-                    </div>
-                    <span>{safetyCount} Verified Nearby</span>
-                </div>
-            </DialogTrigger>
-            <DialogContent className="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <DialogHeader>
-                    <DialogTitle>Verified Nomads</DialogTitle>
-                    <DialogDescription>
-                        There are {safetyCount} verified users active in your area within the last hour.
-                        <br /><br />
-                        <strong>Safety Status:</strong> Green (Safe)
+                    <LocateFixed className="h-6 w-6" />
+                </Button>
+                <SocialTrigger />
+                <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
+            </div>
+        </div>
+
+        {/* Mobile Bottom Bar (Social Left, User Right) */}
+        <div className="absolute bottom-6 left-4 right-4 z-40 flex md:hidden justify-between items-end pointer-events-none">
+            <div className="pointer-events-auto flex flex-col gap-4">
+                {/* Center Button on Mobile (Left side above Social) */}
+                <Button
+                    onClick={onCenterMap}
+                    className="h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
+                >
+                    <LocateFixed className="h-6 w-6" />
+                </Button>
+                <SocialTrigger />
+            </div>
+            <div className="pointer-events-auto">
+                <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
+            </div>
+        </div>
+    </>
+);
+}
+
+
+const SocialTrigger = () => (
+    <Link href="/vibe">
+        <Button
+            className="pointer-events-auto h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
+        >
+            <Heart className="h-6 w-6 fill-current" style={{ color: "var(--main)" }} />
+        </Button>
+    </Link>
+);
+
+import { Slider } from "@/components/ui/slider"; // Added import
+
+// ... imports ...
+
+export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettings, onMapSettingsChange }: ConvoyHUDProps) {
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+    const SettingsDialog = () => (
+        <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+            <DialogContent className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white max-w-[320px] p-0 overflow-hidden">
+                <DialogHeader className="p-4 pb-2">
+                    <DialogTitle className="text-xl font-black uppercase flex items-center gap-2">
+                        <Settings className="h-5 w-5" /> Map Editor
+                    </DialogTitle>
+                    <DialogDescription className="text-xs">
+                        Adjust style and density.
                     </DialogDescription>
                 </DialogHeader>
+
+                <div className="space-y-4 px-4 pb-6">
+                    {/* Style Selector */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-500">
+                            <Palette className="h-3 w-3" /> Theme
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2">
+                            {(["default", "retro", "silver", "dark"] as MapStyleMode[]).map((mode) => (
+                                <button
+                                    key={mode}
+                                    onClick={() => onMapSettingsChange({ ...mapSettings, styleMode: mode })}
+                                    className={cn(
+                                        "px-2 py-1.5 rounded border-2 font-bold text-xs capitalize transition-all",
+                                        mapSettings.styleMode === mode
+                                            ? "border-black bg-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]"
+                                            : "border-zinc-200 bg-white text-zinc-600 hover:border-black hover:text-black"
+                                    )}
+                                >
+                                    {mode}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Density Sliders */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-500">
+                            <Layers className="h-3 w-3" /> Feature Density
+                        </h4>
+                        <div className="space-y-4 rounded-lg border-2 border-zinc-100 p-3 bg-zinc-50/50">
+                            {/* Roads */}
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs font-bold">
+                                    <span>Roads</span>
+                                    <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">{["Off", "Low", "Med", "High"][mapSettings.roadDensity]}</span>
+                                </div>
+                                <Slider
+                                    value={[mapSettings.roadDensity]}
+                                    min={0}
+                                    max={3}
+                                    step={1}
+                                    onValueChange={([v]) => onMapSettingsChange({ ...mapSettings, roadDensity: v })}
+                                    className="cursor-pointer"
+                                />
+                            </div>
+
+                            {/* Landmarks */}
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs font-bold">
+                                    <span>Landmarks</span>
+                                    <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">{["Off", "Low", "Med", "High"][mapSettings.landmarkDensity]}</span>
+                                </div>
+                                <Slider
+                                    value={[mapSettings.landmarkDensity]}
+                                    min={0}
+                                    max={3}
+                                    step={1}
+                                    onValueChange={([v]) => onMapSettingsChange({ ...mapSettings, landmarkDensity: v })}
+                                    className="cursor-pointer"
+                                />
+                            </div>
+
+                            {/* Labels */}
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs font-bold">
+                                    <span>Labels</span>
+                                    <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">{["Off", "Low", "Med", "High"][mapSettings.labelDensity]}</span>
+                                </div>
+                                <Slider
+                                    value={[mapSettings.labelDensity]}
+                                    min={0}
+                                    max={3}
+                                    step={1}
+                                    onValueChange={([v]) => onMapSettingsChange({ ...mapSettings, labelDensity: v })}
+                                    className="cursor-pointer"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </DialogContent>
         </Dialog>
     );
 
-    const SocialTrigger = () => (
-        <Link href="/vibe">
-            <Button
-                className="pointer-events-auto h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
-            >
-                <Heart className="h-6 w-6 fill-current" style={{ color: "var(--main)" }} />
-            </Button>
-        </Link>
-    );
-
     return (
         <>
-            {/* Top Bar (Filters & Safety Ping) */}
-            <div className="absolute top-4 left-4 right-4 z-40 flex justify-between items-start pointer-events-none">
+            <SettingsDialog />
+
+            {/* Top Bar (Filters) */}
+            <div className="absolute top-14 left-4 right-4 z-40 flex justify-between items-start pointer-events-none">
                 {/* Filters (Left) */}
                 <div className="pointer-events-auto flex items-center gap-2 rounded-lg border-2 border-black bg-white p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <FilterButton
@@ -96,30 +229,27 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount }: ConvoyH
                     />
                 </div>
 
-                {/* Right Side (Desktop: User Menu & Social) */}
-                <div className="flex items-center gap-4">
-                    {/* Desktop User Menu & Social */}
-                    <div className="hidden md:flex items-center gap-4 pointer-events-auto">
-                        <SafetyPing />
-                        <SocialTrigger />
-                        <UserMenu />
-                    </div>
+                {/* Right Side (Desktop: Social + User) */}
+                <div className="hidden md:flex items-center gap-4 pointer-events-auto">
+                    <SocialTrigger />
+                    <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
                 </div>
             </div>
 
-            {/* Mobile Bottom Bar (Social & User Menu) */}
+            {/* Mobile Bottom Bar (Social Left, User Right) */}
             <div className="absolute bottom-6 left-4 right-4 z-40 flex md:hidden justify-between items-end pointer-events-none">
                 <div className="pointer-events-auto">
-                    <SafetyPing mobile />
-                </div>
-                <div className="flex items-center gap-4 pointer-events-auto">
                     <SocialTrigger />
-                    <UserMenu />
+                </div>
+                <div className="pointer-events-auto">
+                    <UserMenu onOpenMapEditor={() => setIsSettingsOpen(true)} />
                 </div>
             </div>
         </>
     );
 }
+
+// ... FilterButton ...
 
 function FilterButton({ active, onClick, icon, label, fullLabel, badge }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; fullLabel: string; badge?: number }) {
     return (

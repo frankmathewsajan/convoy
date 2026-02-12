@@ -29,13 +29,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
-import { LogOut, User as UserIcon, Moon, Sun, Laptop, Share2, ChevronDown } from "lucide-react";
+import { LogOut, User as UserIcon, Moon, Sun, Laptop, Share2, ChevronDown, Settings } from "lucide-react";
 import { signOut, updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore"; // Added imports
 import { auth, db } from "@/lib/firebase/config"; // Added db import
 import { InviteDialog } from "@/components/invite-dialog";
 
-export function UserMenu() {
+export function UserMenu({ onOpenMapEditor }: { onOpenMapEditor: () => void }) {
     const { user, userData, refreshUserData, saveTheme } = useAuth(); // Added refreshUserData
     const { setTheme: setMode } = useTheme();
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -87,7 +87,7 @@ export function UserMenu() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
-                            className="relative h-12 w-12 rounded-full border-2 border-black shadow-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 overflow-hidden"
+                            className="relative h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 overflow-hidden"
                         >
                             <Avatar className="h-full w-full">
                                 <AvatarImage src={user.photoURL || ""} alt={user.displayName || "User"} />
@@ -114,6 +114,10 @@ export function UserMenu() {
                                     <span>Edit Profile</span>
                                 </DropdownMenuItem>
                             </DialogTrigger>
+                            <DropdownMenuItem onClick={onOpenMapEditor} className="focus:bg-zinc-100 cursor-pointer">
+                                <Settings className="mr-2 h-4 w-4" />
+                                <span>Map Editor</span>
+                            </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator className="bg-black/20" />
 

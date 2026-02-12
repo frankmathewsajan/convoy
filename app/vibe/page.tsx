@@ -312,40 +312,48 @@ export default function VibePage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center text-white p-6"
+                        className="fixed inset-0 z-50 bg-background/90 flex flex-col items-center justify-center text-foreground p-6"
                         onClick={() => setShowGuide(false)}
                     >
-                        <div className="relative w-full h-full max-w-sm flex flex-col justify-between py-20">
+                        <div className="relative w-full h-full max-w-sm flex flex-col justify-between py-20 px-8">
                             {/* Swipe Down (Details) */}
-                            <div className="flex flex-col items-center gap-2 animate-bounce self-center">
-                                <span className="font-heading text-xl uppercase tracking-widest text-yellow-400">Details</span>
-                                <ArrowUp className="w-10 h-10 text-yellow-400 rotate-180" />
+                            <div className="flex flex-col items-center gap-4 self-center">
+                                <span className="font-black text-2xl uppercase tracking-[0.2em] text-foreground">Details</span>
+                                <div className="p-4 rounded-full border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                    <ArrowUp className="w-8 h-8 text-black rotate-180" strokeWidth={2.5} />
+                                </div>
                             </div>
 
                             {/* Middle Row */}
-                            <div className="flex items-center justify-between w-full px-4">
+                            <div className="flex items-center justify-between w-full">
                                 {/* Left (Skip) */}
-                                <div className="flex flex-col items-center gap-2 transform -translate-x-2">
-                                    <ArrowLeftIcon className="w-10 h-10 text-red-500" />
-                                    <span className="font-heading text-lg uppercase tracking-widest text-red-500">Skip</span>
+                                <div className="flex flex-col items-center gap-4 -translate-y-8">
+                                    <div className="p-4 rounded-full border-4 border-black bg-[#FF6B6B] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                        <ArrowLeftIcon className="w-8 h-8 text-black" strokeWidth={2.5} />
+                                    </div>
+                                    <span className="font-black text-lg uppercase tracking-[0.2em] text-[#FF6B6B]">Skip</span>
                                 </div>
 
                                 {/* Right (Like) */}
-                                <div className="flex flex-col items-center gap-2 transform translate-x-2">
-                                    <ArrowRight className="w-10 h-10 text-green-500" />
-                                    <span className="font-heading text-lg uppercase tracking-widest text-green-500">Like</span>
+                                <div className="flex flex-col items-center gap-4 -translate-y-8">
+                                    <div className="p-4 rounded-full border-4 border-black bg-[#4ECDC4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                        <ArrowRight className="w-8 h-8 text-black" strokeWidth={2.5} />
+                                    </div>
+                                    <span className="font-black text-lg uppercase tracking-[0.2em] text-[#4ECDC4]">Like</span>
                                 </div>
                             </div>
 
                             {/* Swipe Up (Message) */}
-                            <div className="flex flex-col items-center gap-2 animate-bounce self-center">
-                                <ArrowUp className="w-10 h-10 text-blue-400" />
-                                <span className="font-heading text-xl uppercase tracking-widest text-blue-400">Message</span>
+                            <div className="flex flex-col items-center gap-4 self-center">
+                                <div className="p-4 rounded-full border-4 border-black bg-[#45B7D1] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                    <ArrowUp className="w-8 h-8 text-black" strokeWidth={2.5} />
+                                </div>
+                                <span className="font-black text-2xl uppercase tracking-[0.2em] text-[#45B7D1]">Message</span>
                             </div>
                         </div>
 
-                        <div className="absolute bottom-10">
-                            <p className="text-white/50 text-sm font-bold uppercase tracking-widest animate-pulse">Tap to Start</p>
+                        <div className="absolute bottom-10 flex items-center gap-2 animate-pulse">
+                            <span className="text-sm font-black uppercase tracking-widest bg-black text-white px-3 py-1">Tap to Start</span>
                         </div>
                     </motion.div>
                 )}

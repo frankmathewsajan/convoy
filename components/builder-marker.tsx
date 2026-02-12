@@ -1,7 +1,7 @@
 /// <reference types="google.maps" />
 "use client";
 
-import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
+import { CustomOverlay } from "@/components/custom-overlay";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -34,12 +34,17 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
 
     return (
         <>
-            <AdvancedMarker position={position} onClick={() => setIsOpen(true)}>
-                <div className="relative group cursor-pointer">
-                    <Pin background={"var(--main)"} borderColor={"#000"} glyphColor={"#000"} scale={1.2} />
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-1 bg-black/20 blur-sm rounded-full"></div>
+            <CustomOverlay position={position} zIndex={50}>
+                <div className="relative group cursor-pointer" onClick={() => setIsOpen(true)}>
+                    {/* CSS/SVG Pin Replacement */}
+                    <div className="relative" style={{ filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.3))' }}>
+                        <svg width="36" height="48" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 0C5.37258 0 0 5.37258 0 12C0 20.5 12 32 12 32C12 32 24 20.5 24 12C24 5.37258 18.6274 0 12 0Z" fill="var(--main)" stroke="white" strokeWidth="2" />
+                            <circle cx="12" cy="12" r="4" fill="white" />
+                        </svg>
+                    </div>
                 </div>
-            </AdvancedMarker>
+            </CustomOverlay>
 
             {isOpen && (
                 <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[320px] z-50">
