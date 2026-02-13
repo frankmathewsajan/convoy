@@ -4,10 +4,14 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import MapView from "@/components/map-view";
+import { useLocationTracker } from "@/hooks/use-location-tracker";
 
 export default function MapPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+
+  // Track user location every 30s (only writes if moved 100m+)
+  useLocationTracker(user?.uid);
 
   useEffect(() => {
     if (!loading && !user) {

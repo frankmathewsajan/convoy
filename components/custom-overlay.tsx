@@ -7,9 +7,10 @@ type CustomOverlayProps = {
     children: React.ReactNode;
     zIndex?: number;
     anchor?: 'center' | 'bottom';
+    visible?: boolean;
 };
 
-export function CustomOverlay({ position, children, zIndex = 0, anchor = 'bottom' }: CustomOverlayProps) {
+export function CustomOverlay({ position, children, zIndex = 0, anchor = 'bottom', visible = true }: CustomOverlayProps) {
     const map = useMap();
     const [container, setContainer] = useState<HTMLDivElement | null>(null);
     const overlayRef = useRef<google.maps.OverlayView | null>(null);
@@ -110,6 +111,13 @@ export function CustomOverlay({ position, children, zIndex = 0, anchor = 'bottom
             overlay.draw();
         }
     }, [position, zIndex, anchor]);
+
+    // 4. Toggle visibility at the DOM level
+    useEffect(() => {
+        if (container) {
+            container.style.display = visible ? '' : 'none';
+        }
+    }, [visible, container]);
 
     if (!container) return null;
 

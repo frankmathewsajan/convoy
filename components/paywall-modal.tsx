@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { Purchases, Package, PackageType, PurchasesError, ErrorCode } from "@revenuecat/purchases-js";
 import { Loader2, X, Check, Zap, Shield, Users, PartyPopper, RefreshCw } from "lucide-react";
+import { useAuth } from "@/components/auth-provider";
+import { syncSubscriptionAction } from "@/app/actions/subscription-actions";
 
 const REVENUECAT_API_KEY = "test_UcfvVtEKTneUKCOYsCUAEYYHvLX"; // Project ID: proj6f764251
 
@@ -10,6 +12,7 @@ interface PaywallModalProps {
     open: boolean;
     onClose: () => void;
     userId?: string;
+    onPurchaseSuccess?: () => void;
 }
 
 // Friendly name mapping using the actual PackageType enum values
@@ -52,7 +55,8 @@ function getUserFriendlyError(rawMessage: string): string {
     return "Something went wrong. Please try again or contact support.";
 }
 
-export function PaywallModal({ open, onClose, userId }: PaywallModalProps) {
+export function PaywallModal({ open, onClose, userId, onPurchaseSuccess }: PaywallModalProps) {
+    const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [isPurchasing, setIsPurchasing] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -114,9 +118,34 @@ export function PaywallModal({ open, onClose, userId }: PaywallModalProps) {
             setPurchasedPlanName(display.name);
             setPurchaseSuccess(true);
 
-            setTimeout(() => {
-                onClose();
-            }, 3000);
+            // Notify parent to refresh pro status
+            onPurchaseSuccess?.();
+
+            // Sync to Firebase (Fire & Forget)
+            // Sync to Firebase (Fire & Forget)
+            if (user) {
+                try {
+                    const token = await user.getIdToken();
+
+                    // FORCE SYNC: Don't check for activeEnt locally first. 
+                    // Trust that if purchase() succeeded, we should record it.
+                    console.log("💰 [Paywall] Purchase returned. Entitlements:", JSON.stringify(customerInfo.entitlements.active));
+                    console.log("💰 [Paywall] Calling syncSubscriptionAction...");
+
+                    const result = await syncSubscriptionAction(token, customerInfo);
+                    console.log("💰 [Paywall] Sync result:", result);
+
+                } catch (err) {
+                    console.error("Failed to sync purchase to DB:", err);
+                }
+            }
+
+            // Manually refresh pro status immediately
+            if (onPurchaseSuccess) {
+                console.log("🔄 [Paywall] Calling onPurchaseSuccess...");
+                onPurchaseSuccess();
+            }
+            onClose();
         } catch (err: any) {
             console.error("Purchase error:", err);
 
@@ -283,8 +312,8 @@ export function PaywallModal({ open, onClose, userId }: PaywallModalProps) {
                                                 key={pkg.identifier}
                                                 onClick={() => setSelectedPkg(pkg)}
                                                 className={`w-full p-4 rounded-xl border-2 text-left transition-all relative ${isSelected
-                                                        ? "border-black bg-[#FFF9DB] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                                                        : "border-zinc-200 bg-white hover:border-zinc-400"
+                                                    ? "border-black bg-[#FFF9DB] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                                                    : "border-zinc-200 bg-white hover:border-zinc-400"
                                                     }`}
                                             >
                                                 {display.badge && (

@@ -42,31 +42,31 @@ import { CustomOverlay } from "@/components/custom-overlay";
 // I will try to import `InfoWindow`? No.
 // I will implement a `CustomOverlay` component in a new file `components/custom-overlay.tsx` to be safe, then usage it.
 // This is the most robust way to get React content on the map without Map ID.
-import { Loader2 } from "lucide-react";
+import { Loader2, Navigation, X } from "lucide-react";
 import { useAuth } from "@/components/auth-provider"; // Added import
 import { VectorOnboarding } from "@/components/vector-onboarding";
 import { ConvoyHUD } from "@/components/convoy-hud";
 import { BuilderMarker } from "@/components/builder-marker";
+import { NomadMarker } from "@/components/nomad-marker";
 
 // ... imports ...
 import { useTheme } from "next-themes";
 import { getMapStyle, MapStyleOptions } from "./map-styles";
-
-// Mock builders data
-const MOCK_BUILDERS = [
-  { id: 1, lat: 16.4971, lng: 80.4992, name: "VIT-AP Solar Lab", role: "Solar Research", description: "Experimental solar setups and battery testing." },
-  { id: 2, lat: 16.5062, lng: 80.6480, name: "Vijayawada Van Works", role: "Full Build Specialist", description: "Custom cabinetry and electrical systems for travellers." },
-  { id: 3, lat: 16.5193, lng: 80.6115, name: "Amaravati Diesel", role: "Mechanic", description: "Expertise in heavy vehicle maintenance and repairs." },
-];
+import { useNearbyNomads } from "@/hooks/use-nearby-nomads";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/config";
+import { Eye, EyeOff } from "lucide-react";
+import { useVibeLikeCount } from "@/hooks/use-vibe-likes";
 
 export default function MapView() {
   const [center, setCenter] = useState({ lat: 16.4971, lng: 80.4992 });
   const [zoom, setZoom] = useState(12);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [hasVector, setHasVector] = useState(false);
-  const [filter, setFilter] = useState<"all" | "route" | "verified">("all");
+  const [filter, setFilter] = useState<"all" | "builders" | "nomads">("all");
+  const [mapReady, setMapReady] = useState(false);
   const [mapSettings, setMapSettings] = useState<MapStyleOptions>({
-    styleMode: "default",
+    styleMode: "retro",
     showRoads: true,
     showLandmarks: true,
     showLabels: true,
@@ -75,10 +75,33 @@ export default function MapView() {
     labelDensity: 3
   });
 
-  const [isEditingVector, setIsEditingVector] = useState(false); // Added state
+  const [isEditingVector, setIsEditingVector] = useState(false);
+  const [incognito, setIncognito] = useState(false);
+  const [showUserInfo, setShowUserInfo] = useState(false);
 
-  const { user, userData, refreshUserData, loading } = useAuth(); // Added loading
+  const { user, userData, refreshUserData, loading } = useAuth();
   const { theme, resolvedTheme } = useTheme();
+
+  // Fetch nearby nomads (only non-incognito users with locations)
+  const { nomads: nearbyNomads, loading: nomadsLoading } = useNearbyNomads(user?.uid);
+  const vibeLikeCount = useVibeLikeCount(user?.uid);
+
+  // Mark map as ready once user location is known and nomads first loaded
+  useEffect(() => {
+    if (userLocation && !nomadsLoading && !mapReady) {
+      // Small delay to let markers render
+      const t = setTimeout(() => setMapReady(true), 300);
+      return () => clearTimeout(t);
+    }
+  }, [userLocation, nomadsLoading, mapReady]);
+
+  // Fix: Initialize hasVector and incognito from userData
+  useEffect(() => {
+    if (userData) {
+      if (userData.vector) setHasVector(true);
+      if (typeof userData.incognito === "boolean") setIncognito(userData.incognito);
+    }
+  }, [userData]);
 
   // Load Map Settings from Local Storage OR Firebase on Mount/Update
   useEffect(() => {
@@ -132,7 +155,20 @@ export default function MapView() {
   const handleCenterMap = () => {
     if (userLocation) {
       setCenter(userLocation);
-      setZoom(15); // Zoom in when centering
+      setZoom(15);
+    }
+  };
+
+  const toggleIncognito = async () => {
+    const newValue = !incognito;
+    setIncognito(newValue);
+    if (user) {
+      try {
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, { incognito: newValue });
+      } catch (err) {
+        console.error("Error toggling incognito:", err);
+      }
     }
   };
 
@@ -170,7 +206,7 @@ export default function MapView() {
           setUserLocation((prev) => {
             if (!prev) {
               setCenter(pos);
-              setZoom(12);
+              setZoom(14);
             }
             return pos;
           });
@@ -189,6 +225,18 @@ export default function MapView() {
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}>
       <div className="relative w-full h-screen bg-zinc-100">
 
+        {/* Blur overlay until map is ready */}
+        <div
+          className={`absolute inset-0 z-40 pointer-events-none transition-all duration-700 ${mapReady ? "opacity-0" : "opacity-100"
+            }`}
+          style={{ backdropFilter: mapReady ? "none" : "blur(12px)" }}
+        >
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+            <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--main)" }} />
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Loading map…</p>
+          </div>
+        </div>
+
         {/* HUD Overlay */}
         <ConvoyHUD
           activeFilter={filter}
@@ -197,8 +245,22 @@ export default function MapView() {
           mapSettings={mapSettings}
           onMapSettingsChange={setMapSettings}
           onCenterMap={handleCenterMap}
-          onEditVector={() => setIsEditingVector(true)} // Pass handler
+          onEditVector={() => setIsEditingVector(true)}
+          incognito={incognito}
+          onToggleIncognito={toggleIncognito}
+          vibeLikeCount={vibeLikeCount}
         />
+
+        {/* Subtle loading indicator */}
+        <div
+          className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${nomadsLoading ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
+            }`}
+        >
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full border border-zinc-200 shadow-sm text-[11px] font-medium text-zinc-500">
+            <span className="inline-flex w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
+            Syncing nomads…
+          </div>
+        </div>
 
         {/* Map */}
         <Map
@@ -207,7 +269,7 @@ export default function MapView() {
           center={center}
           zoom={zoom}
           onCenterChanged={(ev) => setCenter(ev.detail.center)}
-          onZoomChanged={(ev) => setZoom(ev.detail.zoom)}
+          onZoomChanged={(ev) => { const z = ev.detail.zoom; setZoom(z); console.log(`[Convoy Map] zoom: ${z}`); }}
           styles={mapStyles}
           disableDefaultUI={true}
           style={{ width: "100%", height: "100%" }}
@@ -216,30 +278,61 @@ export default function MapView() {
           {/* User Location Pulse */}
           {userLocation && (
             <CustomOverlay position={userLocation} zIndex={100} anchor="center">
-              <div className="relative flex items-center justify-center w-12 h-12">
-                <span
-                  className="absolute inline-flex w-full h-full rounded-full opacity-50 animate-ping"
-                  style={{ backgroundColor: "var(--main)" }}
-                ></span>
-                <span
-                  className="relative inline-flex w-5 h-5 rounded-full border-4 border-white shadow-xl"
-                  style={{ backgroundColor: "var(--main)" }}
-                ></span>
-                {/* Direction Arrow (Optional) */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserInfo(!showUserInfo)}
+                  className="relative flex items-center justify-center w-12 h-12 cursor-pointer"
+                >
+                  <span
+                    className="absolute inline-flex w-full h-full rounded-full opacity-50 animate-ping"
+                    style={{ backgroundColor: "var(--main)" }}
+                  ></span>
+                  <span
+                    className="relative inline-flex w-5 h-5 rounded-full border-4 border-white shadow-xl"
+                    style={{ backgroundColor: "var(--main)" }}
+                  ></span>
+                </button>
+                {/* User Info Popup */}
+                {showUserInfo && (
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-14 w-52 border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 z-50 bg-white">
+                    <button onClick={() => setShowUserInfo(false)} className="absolute top-2 right-2">
+                      <X className="h-3 w-3" />
+                    </button>
+                    <p className="font-black text-sm truncate">{userData?.displayName || "You"}</p>
+                    {userData?.vector && (
+                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                        <Navigation className="h-3 w-3" style={{ color: "var(--main)" }} />
+                        Heading to {userData.vector}
+                      </p>
+                    )}
+                    <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold tracking-wider">Your Location</p>
+                  </div>
+                )}
               </div>
             </CustomOverlay>
           )}
 
-          {/* Builder Markers (Mock) */}
-          {MOCK_BUILDERS.map((builder) => (
-            <BuilderMarker
-              key={builder.id}
-              position={{ lat: builder.lat, lng: builder.lng }}
-              name={builder.name}
-              role={builder.role}
-              description={builder.description}
-            />
-          ))}
+          {/* Builder Markers */}
+          {nearbyNomads
+            .filter((n) => n.isBuilder)
+            .map((builder) => (
+              <BuilderMarker
+                key={builder.uid}
+                uid={builder.uid}
+                position={builder.location}
+                name={builder.displayName || "Builder"}
+                role="Verified Builder"
+                description={builder.vector ? `Heading to ${builder.vector}` : "Available for work"}
+                visible={filter === "all" || filter === "builders"}
+              />
+            ))}
+
+          {/* Regular Nomad Markers */}
+          {nearbyNomads
+            .filter((n) => !n.isBuilder)
+            .map((nomad) => (
+              <NomadMarker key={nomad.uid} nomad={nomad} visible={filter === "all" || filter === "nomads"} />
+            ))}
 
         </Map>
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Map as MapIcon, Users, Heart, Settings, Palette, Layers, Edit2, LocateFixed } from "lucide-react";
+import { ShieldCheck, Map as MapIcon, Users, Heart, Settings, Palette, Layers, Edit2, LocateFixed, Eye, EyeOff, Hammer, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/user-menu";
 import {
@@ -16,7 +16,7 @@ import Link from "next/link";
 import { MapStyleOptions, MapStyleMode } from "@/components/map-styles";
 import { Slider } from "@/components/ui/slider";
 
-type FilterType = "all" | "route" | "verified";
+type FilterType = "all" | "builders" | "nomads";
 
 interface ConvoyHUDProps {
     activeFilter: FilterType;
@@ -25,20 +25,28 @@ interface ConvoyHUDProps {
     mapSettings: MapStyleOptions;
     onMapSettingsChange: (settings: MapStyleOptions) => void;
     onCenterMap: () => void;
-    onEditVector: () => void; // Added prop
+    onEditVector: () => void;
+    incognito: boolean;
+    onToggleIncognito: () => void;
+    vibeLikeCount?: number;
 }
 
-const SocialTrigger = () => (
-    <Link href="/vibe">
+const SocialTrigger = ({ likesCount = 0 }: { likesCount?: number }) => (
+    <Link href="/vibe" className="relative">
         <Button
             className="pointer-events-auto h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
         >
             <Heart className="h-6 w-6 fill-current" style={{ color: "var(--main)" }} />
         </Button>
+        {likesCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-white shadow-md z-10">
+                {likesCount > 99 ? "99+" : likesCount}
+            </span>
+        )}
     </Link>
 );
 
-export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettings, onMapSettingsChange, onCenterMap, onEditVector }: ConvoyHUDProps) {
+export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettings, onMapSettingsChange, onCenterMap, onEditVector, incognito, onToggleIncognito, vibeLikeCount = 0 }: ConvoyHUDProps) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const SettingsDialog = () => (
@@ -150,28 +158,36 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettin
                         onClick={() => onFilterChange("all")}
                         icon={<Users className="h-4 w-4" />}
                         label="all"
-                        fullLabel="All Nomads"
+                        fullLabel="Everyone"
                     />
                     <FilterButton
-                        active={activeFilter === "route"}
-                        onClick={() => onFilterChange("route")}
-                        icon={<MapIcon className="h-4 w-4" />}
-                        label="route"
-                        fullLabel="On Route"
+                        active={activeFilter === "builders"}
+                        onClick={() => onFilterChange("builders")}
+                        icon={<Hammer className="h-4 w-4" />}
+                        label="builders"
+                        fullLabel="Builders"
                     />
                     <FilterButton
-                        active={activeFilter === "verified"}
-                        onClick={() => onFilterChange("verified")}
-                        icon={<ShieldCheck className="h-4 w-4" />}
-                        label="verified"
-                        fullLabel="Verified"
-                        badge={safetyCount}
+                        active={activeFilter === "nomads"}
+                        onClick={() => onFilterChange("nomads")}
+                        icon={<Compass className="h-4 w-4" />}
+                        label="nomads"
+                        fullLabel="Nomads"
                     />
                 </div>
 
-                {/* Right Side (Desktop: Social + Center + User) */}
+                {/* Right Side (Desktop: Social + Incognito + Center + User) */}
                 <div className="hidden md:flex items-center gap-4 pointer-events-auto">
-                    <SocialTrigger />
+                    <SocialTrigger likesCount={vibeLikeCount} />
+                    {/* Incognito Toggle */}
+                    <Button
+                        onClick={onToggleIncognito}
+                        className={`h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all p-0 flex items-center justify-center ${incognito ? "bg-zinc-800 text-white" : "bg-white text-black"
+                            }`}
+                        title={incognito ? "You're hidden — click to become visible" : "You're visible — click to go incognito"}
+                    >
+                        {incognito ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+                    </Button>
                     {/* Center Map Button */}
                     <Button
                         onClick={onCenterMap}
@@ -181,7 +197,7 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettin
                     </Button>
                     <UserMenu
                         onOpenMapEditor={() => setIsSettingsOpen(true)}
-                        onEditVector={onEditVector} // Pass prop
+                        onEditVector={onEditVector}
                     />
                 </div>
             </div>
@@ -189,19 +205,28 @@ export function ConvoyHUD({ activeFilter, onFilterChange, safetyCount, mapSettin
             {/* Mobile Bottom Bar (Social Left, User Right) */}
             <div className="absolute bottom-6 left-4 right-4 z-40 flex md:hidden justify-between items-end pointer-events-none">
                 <div className="pointer-events-auto flex flex-col gap-4">
-                    {/* Center Button on Mobile (Left side above Social) */}
+                    {/* Incognito Toggle on Mobile */}
+                    <Button
+                        onClick={onToggleIncognito}
+                        className={`h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all p-0 flex items-center justify-center ${incognito ? "bg-zinc-800 text-white" : "bg-white text-black"
+                            }`}
+                        title={incognito ? "You're hidden" : "You're visible"}
+                    >
+                        {incognito ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+                    </Button>
+                    {/* Center Button on Mobile */}
                     <Button
                         onClick={onCenterMap}
                         className="h-12 w-12 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all bg-white p-0 flex items-center justify-center text-black"
                     >
                         <LocateFixed className="h-6 w-6" />
                     </Button>
-                    <SocialTrigger />
+                    <SocialTrigger likesCount={vibeLikeCount} />
                 </div>
                 <div className="pointer-events-auto">
                     <UserMenu
                         onOpenMapEditor={() => setIsSettingsOpen(true)}
-                        onEditVector={onEditVector} // Pass prop
+                        onEditVector={onEditVector}
                     />
                 </div>
             </div>

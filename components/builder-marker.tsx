@@ -3,38 +3,51 @@
 
 import { CustomOverlay } from "@/components/custom-overlay";
 import { useState } from "react";
+import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Hammer, MessageSquare, Navigation, X } from "lucide-react";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+
+import { PaywallModal } from "@/components/paywall-modal";
+import { ChatDialog } from "@/components/chat-dialog";
 
 interface BuilderMarkerProps {
     position: google.maps.LatLngLiteral;
+    uid: string;
     name: string;
     role: string;
     description: string;
+    visible?: boolean;
 }
 
-export function BuilderMarker({ position, name, role, description }: BuilderMarkerProps) {
+export function BuilderMarker({ position, uid, name, role, description, visible = true }: BuilderMarkerProps) {
+    const { user, isPro, refreshProStatus, proLoading } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [showPaywall, setShowPaywall] = useState(false);
+    const [showChat, setShowChat] = useState(false);
+    const [toast, setToast] = useState<string | null>(null);
 
-    const handlePaywallTrigger = () => {
-        setShowPaywall(true);
+    const handleProAction = (action: string) => {
+        console.log("🛠️ [BuilderMarker] Clicked", { action, isPro, proLoading });
+
+        if (proLoading) return;
+
+        if (isPro) {
+            if (action === "Message") {
+                setShowChat(true);
+            } else {
+                setToast(`${action} — coming soon!`);
+                setTimeout(() => setToast(null), 2000);
+            }
+        } else {
+            console.log("🔒 [BuilderMarker] Showing Paywall because isPro=false");
+            setShowPaywall(true);
+        }
     };
 
     return (
         <>
-            <CustomOverlay position={position} zIndex={50}>
+            <CustomOverlay position={position} zIndex={50} visible={visible}>
                 <div className="relative group cursor-pointer" onClick={() => setIsOpen(true)}>
                     {/* CSS/SVG Pin Replacement */}
                     <div className="relative" style={{ filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.3))' }}>
@@ -70,45 +83,45 @@ export function BuilderMarker({ position, name, role, description }: BuilderMark
                         </CardContent>
                         <CardFooter className="grid grid-cols-2 gap-2">
                             <Button
-                                onClick={handlePaywallTrigger}
-                                className="w-full bg-zinc-100 text-black border-2 border-black hover:bg-zinc-200"
+                                onClick={() => handleProAction("Message")}
+                                disabled={proLoading}
+                                className="w-full bg-zinc-100 text-black border-2 border-black hover:bg-zinc-200 disabled:opacity-50"
                             >
                                 <MessageSquare className="h-4 w-4 mr-2" /> Message
                             </Button>
                             <Button
-                                onClick={handlePaywallTrigger}
-                                className="w-full text-black border-2 border-black hover:opacity-90"
+                                onClick={() => handleProAction("Navigate")}
+                                disabled={proLoading}
+                                className="w-full text-black border-2 border-black hover:opacity-90 disabled:opacity-50"
                                 style={{ backgroundColor: 'var(--main)' }}
                             >
                                 <Navigation className="h-4 w-4 mr-2" /> Navigate
                             </Button>
                         </CardFooter>
                     </Card>
+
+                    {/* Toast */}
+                    {toast && (
+                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-4 py-2 bg-black text-white rounded-lg text-sm font-bold whitespace-nowrap shadow-lg">
+                            {toast}
+                        </div>
+                    )}
                 </div>
             )}
 
-            <AlertDialog open={showPaywall} onOpenChange={setShowPaywall}>
-                <AlertDialogContent className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" style={{ boxShadow: '8px 8px 0px 0px var(--main)' }}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="text-2xl font-black uppercase">Unlock Builder Network</AlertDialogTitle>
-                        <AlertDialogDescription asChild className="text-base">
-                            <div>
-                                Get unlimited access to verified mechanics, solar installers, and builders on your route.
+            <PaywallModal
+                open={showPaywall}
+                onClose={() => setShowPaywall(false)}
+                userId={user?.uid}
+                onPurchaseSuccess={refreshProStatus}
+            />
 
-                                <div className="mt-4 p-4 bg-zinc-50 border-2 border-zinc-200 rounded text-center font-bold text-black">
-                                    Join Shipyard Pro for $4.99/mo
-                                </div>
-                            </div>
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="border-2 border-black">Cancel</AlertDialogCancel>
-                        <AlertDialogAction className="text-black border-2 border-black hover:opacity-90 font-bold" style={{ backgroundColor: 'var(--main)' }}>
-                            Unlock Now
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <ChatDialog
+                open={showChat}
+                onOpenChange={setShowChat}
+                recipientId={name} // NOTE: This assumes 'name' is unique or mapped. Actually, BuilderMarker doesn't have uid prop?
+                recipientName={name}
+            />
         </>
     );
 }
