@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=demo.html">
+    <script type="text/javascript">
+        window.location.href = "demo.html"
+    </script>
+    <title>Redirecting...</title>
+</head>
+<body>
+    If you are not redirected automatically, follow this <a href="demo.html">link to the demo</a>.
+</body>
+</html>

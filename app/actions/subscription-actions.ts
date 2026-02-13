@@ -16,7 +16,8 @@ export async function syncSubscriptionAction(
         const decoded = await verifyIdToken(idToken);
         const uid = decoded.uid;
         console.log(`[ServerAction] Verified UID: ${uid}`);
-        console.log("[ServerAction] Payload:", JSON.stringify(customerInfo, null, 2));
+        console.log("[ServerAction] Payload Keys:", Object.keys(customerInfo));
+        // console.log("[ServerAction] Full Payload:", JSON.stringify(customerInfo, null, 2)); // Uncomment for deep debug
 
         // Store the full raw data in a subcollection or main doc? 
         // User asked for "saved in firestore under the user". 
@@ -71,16 +72,38 @@ export async function syncSubscriptionAction(
             }
         }
 
-        // If not active, find the most recent purchase to populate the UI
+        // If not active, find the most recent purchase to populate the UI AND checking if it grants access (Fallback for missing Entitlements)
         if (!isActuallyPro && plainData.allPurchaseDatesByProduct) {
+            console.log("[ServerAction] checking allPurchaseDatesByProduct for fallback access...");
             Object.entries(plainData.allPurchaseDatesByProduct).forEach(([productId, dateStr]) => {
                 const dateMs = new Date(dateStr as string).getTime();
                 if (dateMs > latestDate) {
                     latestDate = dateMs;
                     latestPlan = productId;
-                    // Try to find expiration for this product
+
+                    // Check expiration
+                    let expirationDate = null;
                     if (plainData.allExpirationDatesByProduct && plainData.allExpirationDatesByProduct[productId]) {
-                        latestExpiration = plainData.allExpirationDatesByProduct[productId];
+                        expirationDate = plainData.allExpirationDatesByProduct[productId];
+                        latestExpiration = expirationDate;
+                    }
+
+                    // DETERMINE PRO STATUS:
+                    // 1. If no expiration date => Lifetime => PRO
+                    // 2. If expiration date exists and is in the future => Active => PRO
+                    // 3. If passed => Expired => NOT PRO
+
+                    if (!expirationDate) {
+                        console.log(`[ServerAction] Found potential Lifetime purchase: ${productId}`);
+                        isActuallyPro = true;
+                    } else {
+                        const expMs = new Date(expirationDate).getTime();
+                        if (expMs > Date.now()) {
+                            console.log(`[ServerAction] Found active subscription (by date): ${productId}`);
+                            isActuallyPro = true;
+                        } else {
+                            console.log(`[ServerAction] Found expired subscription: ${productId}`);
+                        }
                     }
                 }
             });

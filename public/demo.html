@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convoy - Demo & Download</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@700;800;900&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #fdf2f8;
+            background-image: 
+                radial-gradient(#000 1px, transparent 1px),
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 20px 20px, 40px 40px, 40px 40px;
+        }
+        h1, h2, h3, .font-heading { font-family: 'Public Sans', sans-serif; }
+        .neo-shadow { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); }
+        .neo-card {
+            border: 3px solid black;
+            background-color: white;
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Nav -->
+    <nav class="border-b-4 border-black bg-yellow-300 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
+        <a href="index.html" class="flex items-center gap-3">
+            <div class="h-8 w-8 bg-black rounded-full"></div>
+            <div class="text-3xl font-black tracking-tighter uppercase font-heading">Convoy</div>
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="font-black uppercase hover:text-pink-600 transition-colors text-sm">Home</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-12 max-w-5xl">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl md:text-7xl font-black uppercase mb-4 tracking-tighter">Convoy Demo</h1>
+            <p class="text-xl font-bold max-w-2xl mx-auto border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                Experience the future of Van Life community connection.
+            </p>
+        </div>
+
+        <!-- Video -->
+        <div class="aspect-video w-full border-4 border-black bg-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-16 relative group">
+            <iframe
+                src="https://player.vimeo.com/video/1164607065?h=6407086877&badge=0&autopause=0&player_id=0&app_id=58479"
+                width="100%"
+                height="100%"
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                title="Convoy Demo Video"
+                class="w-full h-full"
+            ></iframe>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-12">
+            <!-- Installation -->
+            <div class="space-y-8">
+                <h2 class="text-3xl font-black uppercase flex items-center gap-3">
+                    <i class="fa-solid fa-download"></i> Try It Now
+                </h2>
+                
+                <div class="neo-card p-8">
+                    <h3 class="font-black text-xl mb-4 uppercase">1. Get Expo Go</h3>
+                    <div class="flex gap-4 mb-6">
+                        <a href="https://apps.apple.com/us/app/expo-go/id982107779" class="flex-1 bg-black text-white p-3 text-center font-bold border-2 border-black hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-apple text-xl"></i> iOS
+                        </a>
+                        <a href="https://play.google.com/store/apps/details?id=host.exp.exponent" class="flex-1 bg-black text-white p-3 text-center font-bold border-2 border-black hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-google-play text-xl"></i> Android
+                        </a>
+                    </div>
+
+                    <h3 class="font-black text-xl mb-4 uppercase">2. Scan & Play</h3>
+                    <div class="flex flex-col items-center bg-white border-2 border-black p-4 mb-6">
+                        <div id="qrcode"></div>
+                        <p class="mt-4 text-sm font-bold text-center uppercase">Scan with Camera or Expo App</p>
+                    </div>
+
+                    <a href="exp://u.expo.dev/bc3beea2-a9f0-49bc-87ee-583fb43aa582/group/b2ef716e-5034-47f2-a466-6da727042718"
+                       class="block w-full bg-yellow-300 border-2 border-black text-black font-black uppercase py-4 text-center neo-shadow hover:bg-yellow-400 transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none mb-4">
+                        Open in Expo Go
+                    </a>
+                    
+                    <a href="https://expo.dev/preview/update?message=navarea&updateRuntimeVersion=1.0.0&createdAt=2026-02-13T08%3A11%3A34.416Z&slug=exp&projectId=bc3beea2-a9f0-49bc-87ee-583fb43aa582&group=b2ef716e-5034-47f2-a466-6da727042718" 
+                       target="_blank"
+                       class="block w-full bg-white border-2 border-black text-black font-bold uppercase py-3 text-center hover:bg-zinc-50 transition-colors text-sm">
+                        View Build Details <i class="fa-solid fa-external-link-alt ml-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Credentials -->
+            <div class="space-y-8">
+                <h2 class="text-3xl font-black uppercase flex items-center gap-3">
+                    <i class="fa-solid fa-key"></i> Demo Access
+                </h2>
+                
+                <div class="neo-card p-8 bg-pink-100">
+                    <p class="font-bold mb-6 border-b-2 border-black pb-4">
+                        Use these credentials to access the full experience without creating an account.
+                    </p>
+
+                    <!-- Phone -->
+                    <div class="mb-6 group">
+                        <label class="font-black uppercase text-xs mb-1 block">Phone Number</label>
+                        <div class="flex border-2 border-black bg-white p-3 items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-transform">
+                            <code class="font-mono text-xl flex-1 font-bold">9876543210</code>
+                            <button onclick="copyToClipboard('9876543210', this)" class="p-2 hover:text-pink-600 transition-colors">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- OTP -->
+                    <div class="mb-6 group">
+                        <label class="font-black uppercase text-xs mb-1 block">OTP Code</label>
+                        <div class="flex border-2 border-black bg-white p-3 items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-transform">
+                            <code class="font-mono text-xl flex-1 font-bold">159753</code>
+                            <button onclick="copyToClipboard('159753', this)" class="p-2 hover:text-pink-600 transition-colors">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="neo-card bg-blue-100 p-6">
+                    <h3 class="font-black uppercase mb-2">How to install?</h3>
+                    <ol class="list-decimal list-inside space-y-2 font-bold text-sm">
+                        <li>Install <strong>Expo Go</strong> on your phone.</li>
+                        <li>Scan the QR code.</li>
+                        <li>App loads instantly!</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t-4 border-black bg-black text-white py-12 mt-20 text-center">
+        <p class="text-zinc-500 font-bold uppercase tracking-widest">© 2026 Convoy Inc.</p>
+    </footer>
+
+    <script>
+        // Generate QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: "exp://u.expo.dev/bc3beea2-a9f0-49bc-87ee-583fb43aa582/group/b2ef716e-5034-47f2-a466-6da727042718",
+            width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.M
+        });
+
+        // Copy to Clipboard
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text);
+            const icon = btn.querySelector('i');
+            const originalClass = icon.className;
+            
+            icon.className = 'fa-solid fa-check text-green-600';
+            setTimeout(() => {
+                icon.className = originalClass;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
