@@ -37,64 +37,6 @@ const countryConfig: Record<string, { label: string; placeholder: string }> = {
     "+55": { label: "🇧🇷 Brazil", placeholder: "11 91234-5678" },
 };
 
-/**
- * Check if a user (by email or phone) has been invited.
- * Returns the inviter's name if found, or null if not invited.
- */
-async function checkInviteStatus(email: string | null, phone: string | null): Promise<{ invited: boolean; inviterName: string | null; inviterUid: string | null; inviteDocId: string | null }> {
-    const invitesRef = collection(db, "invites");
-
-    // Check by email
-    if (email) {
-        const emailQuery = query(invitesRef, where("type", "==", "email"), where("value", "==", email.toLowerCase()));
-        const emailSnap = await getDocs(emailQuery);
-        if (!emailSnap.empty) {
-            const inviteDoc = emailSnap.docs[0];
-            const data = inviteDoc.data();
-            return { invited: true, inviterName: data.inviterName || "Someone", inviterUid: data.invitedBy, inviteDocId: inviteDoc.id };
-        }
-    }
-
-    // Check by phone
-    if (phone) {
-        const phoneQuery = query(invitesRef, where("type", "==", "phone"), where("value", "==", phone));
-        const phoneSnap = await getDocs(phoneQuery);
-        if (!phoneSnap.empty) {
-            const inviteDoc = phoneSnap.docs[0];
-            const data = inviteDoc.data();
-            return { invited: true, inviterName: data.inviterName || "Someone", inviterUid: data.invitedBy, inviteDocId: inviteDoc.id };
-        }
-    }
-
-    return { invited: false, inviterName: null, inviterUid: null, inviteDocId: null };
-}
-
-/**
- * Pre-check: is this email/phone an existing user OR invited?
- * Runs BEFORE any auth attempt (no OTP sent, no account created for strangers).
- */
-async function preCheckAccess(opts: { email?: string; phone?: string }): Promise<{ allowed: boolean; reason: string }> {
-    const usersRef = collection(db, "users");
-
-    // 1. Check if they're already a registered user
-    if (opts.email) {
-        const q = query(usersRef, where("email", "==", opts.email.toLowerCase()));
-        const snap = await getDocs(q);
-        if (!snap.empty) return { allowed: true, reason: "returning_user" };
-    }
-    if (opts.phone) {
-        const q = query(usersRef, where("phoneNumber", "==", opts.phone));
-        const snap = await getDocs(q);
-        if (!snap.empty) return { allowed: true, reason: "returning_user" };
-    }
-
-    // 2. Check if they have a pending invite
-    const invite = await checkInviteStatus(opts.email || null, opts.phone || null);
-    if (invite.invited) return { allowed: true, reason: "invited" };
-
-    // 3. Neither — not allowed
-    return { allowed: false, reason: "not_invited" };
-}
 
 export default function LoginPage() {
     const router = useRouter();
@@ -138,10 +80,11 @@ export default function LoginPage() {
                     return;
                 }
 
-                // ── New user: check if they have an invite ──
-                const result = await checkInviteStatus(user.email, user.phoneNumber);
+                // ── New user: check if they have an invite (Server Action) ──
+                const { checkUserAccessAction } = await import("@/app/actions/auth-actions");
+                const result = await checkUserAccessAction({ email: user.email || undefined, phone: user.phoneNumber || undefined });
 
-                if (result.invited) {
+                if (result.allowed && result.reason === "invited") {
                     // Ensure Firestore doc exists with invite + auth data
                     await setDoc(userRef, {
                         invitedBy: result.inviterUid,
@@ -164,6 +107,16 @@ export default function LoginPage() {
                     setTimeout(() => {
                         router.push("/map");
                     }, 2500);
+                } else if (result.allowed && result.reason === "returning_user") {
+                    // Should have been caught by userSnap.exists(), but maybe race condition?
+                    // Just let them in, create doc if missing
+                    await setDoc(userRef, {
+                        email: user.email || null,
+                        phoneNumber: user.phoneNumber || null,
+                        displayName: user.displayName || null,
+                        photoURL: user.photoURL || null,
+                    }, { merge: true });
+                    router.push("/map");
                 } else {
                     setError("You haven't been invited yet. Make sure you're using the same email or phone number that received the invite.");
                     setTimeout(async () => {
@@ -204,7 +157,12 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             // Pre-check: is this email a known user or invited?
-            const access = await preCheckAccess({ email });
+            // MUST use Server Action to blindly query 'users' collection without auth
+            const { checkUserAccessAction } = await import("@/app/actions/auth-actions");
+            const access = await checkUserAccessAction({ email });
+
+            if (access.error) throw new Error(access.error);
+
             if (!access.allowed) {
                 setError("Convoy is invite-only. You haven't been invited yet — ask a member to send you an invite using your email address.");
                 return;

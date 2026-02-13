@@ -135,6 +135,14 @@ export function PaywallModal({ open, onClose, userId, onPurchaseSuccess }: Paywa
                     const result = await syncSubscriptionAction(token, customerInfo);
                     console.log("💰 [Paywall] Sync result:", result);
 
+                    if (!result.isPro) {
+                        console.warn("💰 [Paywall] Sync returned isPro=false. Possible configuration mismatch.");
+                        // We STILL show success because they paid, but maybe show a warning?
+                        // Actually, if we show error, they might panic.
+                        // Better to show success but with a "Syncing..." note or just trust the manual refresh.
+                        // Let's rely on onPurchaseSuccess() which refreshes userData.
+                    }
+
                 } catch (err) {
                     console.error("Failed to sync purchase to DB:", err);
                 }

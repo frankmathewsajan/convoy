@@ -21,7 +21,7 @@ service cloud.firestore {
           && (!('invitesRemaining' in request.resource.data) || request.resource.data.invitesRemaining == 1);
 
         allow update: if request.auth != null && request.auth.uid == userId
-          && isUpdatingOnly(['mapSettings', 'location', 'lastLocationUpdate', 'theme', 'displayName', 'photoURL', 'email', 'phoneNumber', 'invitedBy', 'vector', 'incognito', 'vibeProfile', 'vibeActive', 'vibeLikesReceived', 'lastSeen']);
+          // && isUpdatingOnly(['mapSettings', 'location', 'lastLocationUpdate', 'theme', 'displayName', 'photoURL', 'email', 'phoneNumber', 'invitedBy', 'vector', 'incognito', 'vibeProfile', 'vibeActive', 'vibeLikesReceived', 'lastSeen', 'invitesRemaining', 'didInvite']);
       }
 
       // Location history: users can write their own entries

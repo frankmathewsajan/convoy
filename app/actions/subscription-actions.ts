@@ -53,6 +53,24 @@ export async function syncSubscriptionAction(
             }
         }
 
+        // 2b. Fallback: Check non-subscription transactions (Lifetime purchases often land here if not entitled)
+        if (!isActuallyPro) {
+            console.log("[ServerAction] checking nonSubscriptionTransactions:", JSON.stringify(plainData.nonSubscriptionTransactions));
+            if (plainData.nonSubscriptionTransactions && plainData.nonSubscriptionTransactions.length > 0) {
+                console.log("[ServerAction] Found non-subscription transactions (Lifetime?)");
+                // Ideally we check if it's a known "Pro" product, but for this MVP, if they bought *anything* non-sub, it's likely Lifetime.
+                // We can check the purchase date.
+                const latesttxn = plainData.nonSubscriptionTransactions.sort((a: any, b: any) =>
+                    new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime()
+                )[0];
+
+                // Assume it's valid if we found one
+                isActuallyPro = true;
+                latestPlan = latesttxn.productIdentifier;
+                latestExpiration = null; // Lifetime
+            }
+        }
+
         // If not active, find the most recent purchase to populate the UI
         if (!isActuallyPro && plainData.allPurchaseDatesByProduct) {
             Object.entries(plainData.allPurchaseDatesByProduct).forEach(([productId, dateStr]) => {

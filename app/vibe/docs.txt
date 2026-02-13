@@ -1,0 +1,182 @@
+===================================================================
+DOCUMENT 1: VANLIFE SAFETY APP – TECHNICAL DOCUMENTATION
+===================================================================
+
+1. Overview
+Convoy is an invite-only, safety-first networking platform designed specifically for van-life travelers and digital nomads. It enables travelers living and moving in vans to:
+• Discover nearby nomads in real time
+• Match based on shared travel direction ("Vector")
+• Interact through a swipe-based discovery system (Vibe Zone)
+• Control privacy and visibility through layered safety settings
+• Unlock advanced coordination tools via subscription (Convoy Pro)
+
+Convoy combines community trust, real-time location intelligence, and monetized safety tooling to create a secure ecosystem for nomadic travel.
+
+2. Problem Statement
+Van-life travelers frequently move through remote, unfamiliar, and sometimes unsafe areas. Existing tools (Google Maps, social media, messaging apps) do not provide:
+• Verified, gated community onboarding
+• Route-based traveler matching
+• Location privacy controls
+• Convoy coordination mechanisms
+• Safety-first interaction architecture
+
+3. Community Growth Model (Invite-Only Architecture)
+Convoy operates on a progressive invite system:
+1. A verified member invites a new user.
+2. The invited user joins using a unique invite code.
+3. After onboarding, that user receives limited invite capacity.
+4. The network grows through trusted referrals only.
+
+Benefits:
+• Organic trust graph
+• Reduced spam and bot infiltration
+• Higher accountability
+• Safer interactions
+
+Technical Note: Firestore rules prevent unauthorized invite creation. Invite management is handled through server-side actions using Firebase Admin SDK.
+
+4. Technology Stack
+Frontend:
+• Next.js 16 (App Router)
+• React 19
+• Tailwind CSS
+• Radix UI (shadcn-based components)
+• Framer Motion
+• @vis.gl/react-google-maps
+• Lucide Icons
+
+Backend:
+• Firebase Authentication (Email + Phone OTP)
+• Firestore (real-time database)
+• Firebase Storage (media handling)
+• Firebase Admin SDK (server actions & secure writes)
+• Firebase Hosting / App Hosting
+
+Monetization:
+• RevenueCat Web SDK (@revenuecat/purchases-js)
+• Stripe Web Billing (via RevenueCat)
+• Subscription synchronization via server actions
+
+5. System Architecture
+High-Level Flow: User (Browser) -> Next.js Frontend -> Firebase Auth -> Firestore -> RevenueCat Validation -> Firebase Admin Server Actions.
+
+Architecture Characteristics:
+• Client-side reads (real-time on Snapshot)
+• Sensitive writes proxied through server actions
+• Firestore security rules enforce access boundaries
+• Subscription state synced to Firestore via server-side verification
+
+6. Authentication & Onboarding
+Users must:
+• Sign up via Email/Password or Phone OTP
+• Enter a valid invite code
+• Complete profile setup
+
+Profile Includes:
+• Display name (optional anonymization)
+• Vehicle type (e.g., Sprinter 170, Ford Transit)
+• Travel style (Hiker, Builder, Solo)
+• Photos (stored in Firebase Storage)
+• Bio
+• Current Vector (destination)
+• Privacy mode
+
+7. Core Features
+
+7.1 Real-Time Map Discovery
+Users see nearby nomads on an interactive Google Map.
+• Powered by Geolocation API, Firestore listeners, and custom map overlays.
+• Updates every 30 seconds; only writes if moved >= 100 meters.
+• Filters: ALL, BUILDERS (verified mechanics), NOMADS, ROUTE.
+• Incognito users are automatically excluded.
+
+7.2 Travel Vector System
+Each user sets a "Vector" (destination) stored in users/{uid}.vector. This enables route-based matching, convoy suggestions, and direction-aware filtering.
+
+7.3 Route Convergence Detection
+Convoy detects when two users are heading toward the same destination. Matching logic considers similar destination strings, proximity, and direction overlap.
+• Shared destinations appear in the ROUTE filter.
+• UI highlights shared travel direction.
+• Safety Impact: Encourages group travel, reduces solo risk, enables pre-coordination.
+
+7.4 Vibe Zone (Swipe-Based Discovery)
+• Swipe left: Skip
+• Swipe right: Like
+• Swipe up: Message
+• Swipe down: Undo/Previous
+• Requires 'vibeActive' status to appear. Likes handled via server actions.
+
+7.5 Messaging System
+Conversation IDs: {uid1}_{uid2}. Messages stored in vibe-messages collection. Only participants can write. Convoy Pro enables unlimited messaging.
+
+7.6 Privacy & Safety Layer
+• Public Mode: Visible on map, eligible for route detection, appears in Vibe Zone.
+• Incognito Mode: Hidden from discovery, location excluded, profile masked.
+• Additional Controls: Hide exact coordinates, Mask display name.
+
+8. RevenueCat Integration (Convoy Pro)
+Convoy uses RevenueCat Web SDK for subscription management.
+• Plans: Monthly, Annual, Lifetime, Multi-month.
+• Convoy Pro Unlocks: Unlimited messaging, Access to verified builders, Priority route detection, Enhanced visibility, Advanced convoy tools.
+• Process: Purchase -> RevenueCat validation -> Server action validates ID token -> Subscription tier synced to Firestore -> isPro flag updated.
+
+9. Data Model (Firestore)
+Collections:
+• users: displayName, photoURL, vector, incognito, vibeProfile, vibeActive, location, mapSettings, isPro, invitesRemaining, invitedBy.
+• invites
+• vibe-likes
+• vibe-interactions
+• vibe-messages
+• locationHistory
+
+10. Security & Access Control
+• Firestore Rules: Auth required for reads; users can only modify own data.
+• Server Actions (Admin SDK): Invite validation, Subscription sync, Sensitive writes.
+• Secrets: Stored in environment variables (FIREBASE_PRIVATE_KEY, etc.). No secrets committed to repository.
+
+11. Scalability
+• Firestore real-time listeners scale automatically.
+• Firebase Hosting handles serverless scaling.
+• Write operations minimized via distance thresholds.
+
+12. Future Enhancements
+• SOS emergency broadcast
+• Live convoy tracking
+• Route heatmaps
+• AI-based trust scoring
+• Offline-first mode
+• Push notifications for route convergence
+
+===================================================================
+DOCUMENT 2: WRITTEN PROPOSAL
+===================================================================
+
+Problem
+Van-life travelers and digital nomads live on the road, moving through remote and sparsely populated regions, often alone. Existing platforms (social media, maps) lack trusted onboarding, route-based matching, and safety-first interaction design.
+
+Solution
+Convoy is an invite-only safety and networking platform built specifically for van-life travelers. It is not a generic social platform but a convoy intelligence system combining trust-based onboarding, real-time location intelligence, destination-aware matching, and subscription-powered safety tools.
+
+Core Innovations
+
+1. Invite-Only Trust Network
+Convoy grows through progressive invitations. Verified users invite others, who receive limited invite capacity. This creates a trusted ecosystem and reduces spam/bots.
+
+2. Real-Time Vector Matching
+Users set a travel "Vector". Convoy detects when two users are traveling toward the same place or have overlapping routes. These users are surfaced in a ROUTE filter to enable safer group travel.
+
+3. Privacy-First Location Intelligence
+Unlike traditional apps, Convoy offers Incognito mode (fully hidden), location masking, and name anonymization. Users choose when and how they are discoverable.
+
+4. Vibe Zone - Lightweight Interaction
+A swipe-based discovery layer (Skip, Like, Message) enables frictionless interaction without overexposure. Only active participants appear.
+
+5. Convoy Pro (Monetized Safety Layer)
+RevenueCat powers subscription tiers. Pro unlocks unlimited messaging, verified builder access, priority route matching, and advanced coordination tools. Subscription is positioned as enhanced safety intelligence.
+
+Technical Approach
+• Stack: Next.js 16+, React 19, Firebase Auth, Firestore, Firebase Admin SDK, RevenueCat Web SDK, Google Maps.
+• Security: Server-side invite validation and subscription syncing, strict Firestore field whitelisting, default deny database rules.
+
+Impact
+Convoy transforms nomadic travel from isolated movement into coordinated, trust-based mobility. It reduces solo travel risk and random unsafe encounters while increasing community trust and real-time coordination.

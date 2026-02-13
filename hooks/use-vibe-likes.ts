@@ -209,3 +209,113 @@ export async function sendVibeMessage(
         updatedAt: serverTimestamp()
     }, { merge: true });
 }
+
+// ─────────────────────────────────────────────────────────
+// Messaging Hooks
+// ─────────────────────────────────────────────────────────
+
+export interface VibeConversation {
+    id: string;
+    participants: string[];
+    lastMessage: string;
+    lastMessageTime: any;
+    updatedAt: any;
+    otherUserUid: string; // Helper for UI
+}
+
+export interface VibeMessage {
+    id: string;
+    from: string;
+    to: string;
+    text: string;
+    timestamp: any;
+}
+
+/**
+ * Hook: Fetch all conversations for the current user.
+ */
+export function useVibeConversations(uid: string | undefined) {
+    const [conversations, setConversations] = useState<VibeConversation[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!uid) return;
+        setLoading(true);
+
+        const q = query(
+            collection(db, "vibe-messages"),
+            where("participants", "array-contains", uid)
+            // Note: Ordering by 'updatedAt' requires a composite index. 
+            // If it fails, check console for index creation link.
+            // orderBy("updatedAt", "desc") 
+        );
+
+        const unsub = onSnapshot(q, (snap) => {
+            const results: VibeConversation[] = [];
+            snap.docs.forEach((d) => {
+                const data = d.data();
+                const otherUserUid = data.participants.find((p: string) => p !== uid) || "unknown";
+                results.push({
+                    id: d.id,
+                    participants: data.participants,
+                    lastMessage: data.lastMessage,
+                    lastMessageTime: data.lastMessageTime,
+                    updatedAt: data.updatedAt,
+                    otherUserUid
+                });
+            });
+            // Client-side sort to avoid index issues for now
+            results.sort((a, b) => (b.updatedAt?.toMillis() || 0) - (a.updatedAt?.toMillis() || 0));
+            setConversations(results);
+            setLoading(false);
+        });
+
+        return () => unsub();
+    }, [uid]);
+
+    return { conversations, loading };
+}
+
+/**
+ * Hook: Fetch messages for a specific conversation.
+ */
+export function useVibeMessages(conversationId: string | null) {
+    const [messages, setMessages] = useState<VibeMessage[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (!conversationId) {
+            setMessages([]);
+            return;
+        }
+        setLoading(true);
+
+        const q = query(
+            collection(db, "vibe-messages", conversationId, "messages"),
+            // orderBy("timestamp", "asc") // Again, might need index if mixed with where? No, this is subcollection.
+        );
+        // We need to sort by timestamp. Default order is doc ID which isn't time.
+        // Let's rely on client-side sort if query fails, but query should work for simple collection scan.
+
+        const unsub = onSnapshot(q, (snap) => {
+            const results: VibeMessage[] = [];
+            snap.docs.forEach((d) => {
+                const data = d.data();
+                results.push({
+                    id: d.id,
+                    from: data.from,
+                    to: data.to,
+                    text: data.text,
+                    timestamp: data.timestamp,
+                });
+            });
+            results.sort((a, b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+            setMessages(results);
+            setLoading(false);
+        });
+
+        return () => unsub();
+    }, [conversationId]);
+
+    return { messages, loading };
+}
