@@ -16,6 +16,7 @@ export interface VibeUser {
     photoURL: string | null;
     location?: { lat: number; lng: number };
     isBuilder?: boolean;
+    vibeProfile?: any;
 }
 
 /**

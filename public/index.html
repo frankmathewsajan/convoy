@@ -82,8 +82,14 @@
                 <div class="text-3xl font-black tracking-tighter uppercase font-heading">Convoy</div>
             </div>
             <div class="flex items-center gap-4">
+                <a href="/technical" class="font-black uppercase hover:text-pink-600 transition-colors hidden md:block text-sm">
+                    Docs
+                </a>
+                <a href="/proposal" class="font-black uppercase hover:text-pink-600 transition-colors hidden md:block text-sm">
+                    Proposal
+                </a>
                 <a href="#pricing" class="font-black uppercase hover:text-pink-600 transition-colors hidden md:block text-sm">
-                    See Pricing
+                    Pricing
                 </a>
                 <a href="/login" class="bg-white border-2 border-black px-6 py-2 font-black uppercase neo-shadow transition-all text-black hover:bg-pink-200 text-sm md:text-base">
                     Download App
@@ -158,49 +164,54 @@
             <h2 class="text-5xl md:text-7xl font-black uppercase mb-4 tracking-tighter">Convoy+</h2>
             <p class="text-xl md:text-2xl font-bold mb-16 max-w-2xl mx-auto">Unlock premium features and support the community.</p>
 
-            <div class="flex flex-col lg:flex-row justify-center items-stretch gap-8 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1400px] mx-auto items-stretch">
+                
                 <!-- Free Plan -->
-                <div class="w-full max-w-sm bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col">
-                    <h3 class="text-3xl font-black uppercase mb-2">Free</h3>
-                    <div class="text-5xl font-black mb-6">$0 <span class="text-lg font-bold text-zinc-500">/ forever</span></div>
-                    <ul class="space-y-3 mb-8 font-bold text-lg flex-grow">
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Community Access</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Basic Routing</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Safety Alerts</li>
+                <div class="w-full bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col">
+                    <h3 class="text-2xl font-black uppercase mb-2">Free</h3>
+                    <div class="text-4xl font-black mb-4">$0 <span class="text-sm font-bold text-zinc-500">/ forever</span></div>
+                    <ul class="space-y-2 mb-8 font-bold text-base flex-grow">
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Community Access</li>
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Basic Routing</li>
                     </ul>
-                    <a href="/login" class="w-full bg-zinc-100 text-black py-4 font-black uppercase tracking-widest hover:bg-zinc-200 transition-colors border-2 border-black text-center block">Get Started</a>
+                    <a href="/login" class="w-full bg-zinc-100 text-black py-3 font-black uppercase tracking-widest hover:bg-zinc-200 transition-colors border-2 border-black text-center block text-sm">Join</a>
                 </div>
 
                 <!-- Monthly Plan -->
-                <div class="w-full max-w-sm bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col">
-                    <div class="absolute top-0 right-0 bg-zinc-200 text-black text-xs font-black px-3 py-1 uppercase border-b-2 border-l-2 border-black">Flexible</div>
-                    <h3 class="text-3xl font-black uppercase mb-2">Monthly</h3>
-                    <div class="text-5xl font-black mb-6">$4.99 <span class="text-lg font-bold text-zinc-500">/ mo</span></div>
-                    <ul class="space-y-3 mb-8 font-bold text-lg flex-grow">
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Connect with Builders</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Unlimited Invites</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Verified Badge</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Offline Maps</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Priority Support</li>
+                <div class="w-full bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col">
+                    <h3 class="text-2xl font-black uppercase mb-2">Monthly</h3>
+                    <div class="text-4xl font-black mb-4">$9.99 <span class="text-sm font-bold text-zinc-500">/ mo</span></div>
+                    <ul class="space-y-2 mb-8 font-bold text-base flex-grow">
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Connect with Builders</li>
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Unlimited Invites</li>
                     </ul>
-                    <button class="w-full bg-black text-white py-4 font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors border-2 border-black">Choose Monthly</button>
+                    <button class="w-full bg-white text-black py-3 font-black uppercase tracking-widest hover:bg-zinc-100 transition-colors border-2 border-black text-sm">Select</button>
                 </div>
 
                 <!-- Yearly Plan -->
-                <div class="w-full max-w-sm bg-yellow-300 border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden transform lg:-rotate-1 hover:rotate-0 z-10 flex flex-col">
-                    <div class="absolute top-0 right-0 bg-black text-white text-xs font-black px-3 py-1 uppercase">Best Value</div>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-3xl font-black uppercase">Yearly</h3>
-                        <span class="bg-pink-500 text-white text-xs px-2 py-1 font-black rounded border-2 border-black transform rotate-2">SAVE 12%</span>
-                    </div>
-                    <div class="text-5xl font-black mb-6">$52.99 <span class="text-lg font-bold text-black/60">/ yr</span></div>
-                    <ul class="space-y-3 mb-8 font-bold text-lg flex-grow">
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> All Pro Features</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> 2 Months Free</li>
-                        <li class="flex items-center gap-3"><svg class="w-6 h-6 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Priority Access</li>
+                <div class="w-full bg-yellow-300 border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col transform lg:-rotate-1 hover:rotate-0 z-10">
+                    <div class="absolute top-0 right-0 bg-black text-white text-[10px] font-black px-2 py-0.5 uppercase">Best Value</div>
+                    <h3 class="text-2xl font-black uppercase mb-2">Yearly</h3>
+                    <div class="text-4xl font-black mb-4">$79.99 <span class="text-sm font-bold text-black/60">/ yr</span></div>
+                    <ul class="space-y-2 mb-8 font-bold text-base flex-grow">
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Save 33%</li>
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Priority Support</li>
                     </ul>
-                    <button class="w-full bg-white text-black py-4 font-black uppercase tracking-widest hover:bg-gray-50 transition-colors border-2 border-black neo-shadow">Choose Yearly</button>
+                    <button class="w-full bg-black text-white py-3 font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors border-2 border-black text-sm">Select</button>
                 </div>
+
+                <!-- Lifetime Plan -->
+                <div class="w-full bg-pink-200 border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all text-left relative overflow-hidden flex flex-col">
+                    <div class="absolute top-0 right-0 bg-black text-white text-[10px] font-black px-2 py-0.5 uppercase">Limited</div>
+                    <h3 class="text-2xl font-black uppercase mb-2">Lifetime</h3>
+                    <div class="text-4xl font-black mb-4">$99.99 <span class="text-sm font-bold text-black/60">/ once</span></div>
+                    <ul class="space-y-2 mb-8 font-bold text-base flex-grow">
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Pay Once, Own Forever</li>
+                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-black flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Founder Badge</li>
+                    </ul>
+                    <button class="w-full bg-white text-black py-3 font-black uppercase tracking-widest hover:bg-zinc-100 transition-colors border-2 border-black text-sm">Select</button>
+                </div>
+
             </div>
         </div>
     </section>

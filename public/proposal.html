@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convoy - Written Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@700;800;900&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #facc00; border: 2px solid #000; }
+        ::-webkit-scrollbar-thumb:hover { background: #fff; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #fdf2f8; /* pink-50 */
+            background-image: 
+                radial-gradient(#000 1px, transparent 1px),
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 20px 20px, 40px 40px, 40px 40px;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-heading { font-family: 'Public Sans', sans-serif; }
+        .neo-shadow { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow:hover { box-shadow: 2px 2px 0px 0px rgba(0,0,0,1); transform: translate(2px, 2px); }
+        .neo-card {
+            border: 3px solid black;
+            background-color: white;
+            padding: 2rem;
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <nav class="border-b-4 border-black bg-yellow-300 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
+        <a href="/" class="flex items-center gap-3">
+            <div class="h-8 w-8 bg-black rounded-full"></div>
+            <div class="text-3xl font-black tracking-tighter uppercase font-heading">Convoy</div>
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="/" class="font-black uppercase hover:text-pink-600 transition-colors hidden md:block text-sm">Home</a>
+            <a href="/technical" class="font-black uppercase hover:text-pink-600 transition-colors hidden md:block text-sm">Docs</a>
+            <a href="/proposal" class="font-black uppercase hover:text-pink-600 transition-colors hidden md:block text-sm">Proposal</a>
+            <a href="/login" class="bg-white border-2 border-black px-6 py-2 font-black uppercase neo-shadow transition-all text-black hover:bg-pink-200 text-sm md:text-base">Download App</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-12 max-w-6xl">
+        <div class="neo-card w-full mb-12">
+            <h1 class="text-4xl md:text-6xl font-black uppercase mb-8 border-b-4 border-black pb-4">Written Proposal</h1>
+            
+            <div class="space-y-8 text-left">
+                <section>
+                    <h2 class="text-2xl font-black uppercase mb-3 bg-pink-200 inline-block px-2 border-2 border-black">Problem</h2>
+                    <p class="text-lg leading-relaxed">Van-life travelers and digital nomads live on the road, moving through remote and sparsely populated regions, often alone. Existing platforms (social media, maps) lack trusted onboarding, route-based matching, and safety-first interaction design.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-black uppercase mb-3 bg-blue-200 inline-block px-2 border-2 border-black">Solution</h2>
+                    <p class="text-lg leading-relaxed">Convoy is an invite-only safety and networking platform built specifically for van-life travelers. It is not a generic social platform but a convoy intelligence system combining trust-based onboarding, real-time location intelligence, destination-aware matching, and subscription-powered safety tools.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-3xl font-black uppercase mb-6 border-b-2 border-black pb-2">Core Innovations</h2>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-black uppercase mb-2">1. Invite-Only Trust Network</h3>
+                        <p class="text-lg">Convoy grows through progressive invitations. Verified users invite others, who receive limited invite capacity. This creates a trusted ecosystem and reduces spam/bots.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xl font-black uppercase mb-2">2. Real-Time Vector Matching</h3>
+                        <p class="text-lg">Users set a travel "Vector". Convoy detects when two users are traveling toward the same place or have overlapping routes. These users are surfaced in a ROUTE filter to enable safer group travel.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xl font-black uppercase mb-2">3. Privacy-First Location Intelligence</h3>
+                        <p class="text-lg">Unlike traditional apps, Convoy offers Incognito mode (fully hidden), location masking, and name anonymization. Users choose when and how they are discoverable.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xl font-black uppercase mb-2">4. Vibe Zone - Lightweight Interaction</h3>
+                        <p class="text-lg">A swipe-based discovery layer (Skip, Like, Message) enables frictionless interaction without overexposure. Only active participants appear.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xl font-black uppercase mb-2">5. Convoy Pro (Monetized Safety Layer)</h3>
+                        <p class="text-lg">RevenueCat powers subscription tiers. Pro unlocks unlimited messaging, verified builder access, priority route matching, and advanced coordination tools. Subscription is positioned as enhanced safety intelligence.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-black uppercase mb-3 bg-green-200 inline-block px-2 border-2 border-black">Technical Approach</h2>
+                    <ul class="list-disc pl-6 space-y-2 text-lg marker:text-black font-medium">
+                        <li><strong>Stack:</strong> Next.js 16+, React 19, Firebase Auth, Firestore, Firebase Admin SDK, RevenueCat Web SDK, Google Maps.</li>
+                        <li><strong>Security:</strong> Server-side invite validation and subscription syncing, strict Firestore field whitelisting, default deny database rules.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-black uppercase mb-3 bg-yellow-200 inline-block px-2 border-2 border-black">Impact</h2>
+                    <p class="text-lg leading-relaxed">Convoy transforms nomadic travel from isolated movement into coordinated, trust-based mobility. It reduces solo travel risk and random unsafe encounters while increasing community trust and real-time coordination.</p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t-4 border-black bg-black text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-6xl font-black uppercase mb-6 tracking-tighter hover:text-pink-500 transition-colors cursor-default">Convoy</h2>
+            <p class="text-zinc-500 font-bold text-sm uppercase tracking-widest">© 2026 Convoy Inc. Built for the Open Road.</p>
+        </div>
+    </footer>
+</body>
+</html>

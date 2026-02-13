@@ -10,20 +10,13 @@
   },
   "hosting": {
     "public": "public",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "convoy-backend",
-          "region": "asia-southeast1"
-        }
-      }
     ]
+
   },
   "apphosting": {
     "backendId": "convoy-backend",
